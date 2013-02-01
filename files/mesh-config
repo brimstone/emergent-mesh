@@ -1,0 +1,76 @@
+#!/bin/sh
+
+### Main radio0 will broadcast one AP with no encryption 
+### Another VAP in adhoc mode is added to main radio0.
+
+### Node-specific settings
+read -p "Hostname: " HOSTNAME
+read -p "IP: " IP
+
+### These parameters should be consistent across all nodes
+export NETMASK="255.255.252.0" 
+export DNS="" 
+export GATEWAY="" 
+export PUBLIC_ESSID="The Mesh"
+export PUBLIC_BSSID="DE:AD:BE:EF:CA:FE"
+export ADHOC0_BSSID="CA:CA:CA:CA:CA:00" 
+export ADHOC0_ESSID="meshtrunk"
+export ADHOC0_CHANNEL="1" 
+
+### Ensure of populating /etc/config/wireless with 
+### autodetected wifi-device entries (radioX)
+### to get all list_capab and hwmode correct. Otherwise
+### OpenWRT might fail to configure the radio properly.
+wifi detect >>/etc/config/wireless
+
+### Clear preexisting wifi-iface sections to avoid conflicts or dups
+( for i in `seq 0 9` ; do echo "delete wireless.@wifi-iface[]" ; done ) | uci batch -q
+
+### Create /etc/config/batman-adv if it's not there yet.
+uci import -m batman-adv </dev/null
+
+echo " 
+set system.@system[0].hostname=$HOSTNAME
+
+set batman-adv.bat0=mesh
+set batman-adv.bat0.gw_mode=client
+
+#set network.wan.proto=dhcp
+set network.lan.ipaddr=$IP
+set network.lan.netmask=$NETMASK
+set network.lan.dns='$DNS'
+set network.lan.gateway=$GATEWAY
+set network.lan.ifname='bat0'
+set network.mesh=interface
+set network.mesh.ifname=adhoc0
+set network.mesh.proto=batadv
+set network.mesh.mtu=1528
+set network.mesh.mesh=bat0
+
+set wireless.radio0=wifi-device
+set wireless.radio0.channel=$ADHOC0_CHANNEL
+set wireless.radio0.disabled=0
+set wireless.radio0.phy=phy0
+set wireless.radio0.macaddr=
+
+add wireless wifi-iface
+set wireless.@wifi-iface[-1].device=radio0
+set wireless.@wifi-iface[-1].encryption=none
+set wireless.@wifi-iface[-1].network=lan
+set wireless.@wifi-iface[-1].mode=ap
+set wireless.@wifi-iface[-1].ssid='$PUBLIC_ESSID'
+set wireless.@wifi-iface[-1].bssid=$PUBLIC_BSSID
+
+add wireless wifi-iface
+set wireless.@wifi-iface[-1].device=radio0 
+set wireless.@wifi-iface[-1].ifname=adhoc0
+set wireless.@wifi-iface[-1].encryption=none
+set wireless.@wifi-iface[-1].network=mesh
+set wireless.@wifi-iface[-1].mode=adhoc 
+set wireless.@wifi-iface[-1].bssid=$ADHOC0_BSSID
+set wireless.@wifi-iface[-1].ssid='$ADHOC0_ESSID'
+set wireless.@wifi-iface[-1].mcast_rate=11000 
+set wireless.@wifi-iface[-1].hidden=true
+commit" \
+| uci batch
+

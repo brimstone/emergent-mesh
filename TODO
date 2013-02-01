@@ -1,0 +1,4 @@
+write checketh0
+verify base-files/etc/config/network changes
+
+TEST!

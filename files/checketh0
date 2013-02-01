@@ -1,0 +1,24 @@
+#!/bin/sh
+# if eth0 is down
+if ethtool eth0 | grep -q "Link detected: no" ; then
+	# if we're not in gw client mode, set it with batctl
+	batctl gw | grep -q "client" || batctl gw client
+	# if dnsmasq is running, stop it
+	pidof dnsmasq > /dev/null && /etc/init.d/dnsmasq stop
+	# set led blink
+	echo "timer" > /sys/devices/platform/leds-gpio/leds/tp-link\:blue\:system/trigger
+
+# if eth0 is up
+else
+	# if dnsmasq is not running, start it
+	pidof dnsmasq > /dev/null || /etc/init.d/dnsmasq start
+	# if we're not in gw server mode, set it with batctl
+	batctl gw | grep -q "server" || batctl gw server
+	# set led solid
+	echo "default-on" > /sys/devices/platform/leds-gpio/leds/tp-link\:blue\:system/trigger
+	# set iptables rules
+	iptables -t nat -F POSTROUTING
+	iptables -t nat -A POSTROUTING -s 172.16.0.0/22 -j MASQUERADE
+	# set kernel forwarder
+	echo 1 > /proc/sys/net/ipv4/ip_forward
+fi
