@@ -1,4 +1,3 @@
-write checketh0
-verify base-files/etc/config/network changes
+configure splashd to start automatically
 
 TEST!

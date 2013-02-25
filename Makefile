@@ -8,7 +8,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=brim-mesh
-PKG_RELEASE:=1
+PKG_RELEASE:=2013-02-08
 
 PKG_LICENSE:=GPLv3
 PKG_LICENSE_FILES:=

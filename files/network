@@ -7,11 +7,13 @@ config interface loopback
 	option netmask	255.0.0.0
 
 config interface wan
-	option proto	dhcp
+	option proto	static
 	option ifname	eth0
+	option ipaddr	192.168.1.1
+	option netmask	255.255.255.0
 
 config interface lan
 	option type 	bridge
 	option proto	static
-	option ipaddr	192.168.1.2
-	option netmask	255.255.255.0
+	option ipaddr	172.16.0.1
+	option netmask	255.255.252.0

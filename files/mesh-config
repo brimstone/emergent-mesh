@@ -35,7 +35,10 @@ set system.@system[0].hostname=$HOSTNAME
 set batman-adv.bat0=mesh
 set batman-adv.bat0.gw_mode=client
 
-#set network.wan.proto=dhcp
+delete network.wan
+set network.wan=interface
+set network.wan.ifname=eth0
+set network.wan.proto=dhcp
 set network.lan.ipaddr=$IP
 set network.lan.netmask=$NETMASK
 set network.lan.dns='$DNS'
