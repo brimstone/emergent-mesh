@@ -34,7 +34,7 @@ isrouting() {
 }
 
 logit() {
-	echo "$(date) $1" >> /tmp/checketh0
+	echo "$(date) $1" >> /tmp/node.log
 }
 
 gatewaymode() {

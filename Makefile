@@ -36,7 +36,7 @@ define Package/brim-mesh/install
 	$(INSTALL_DATA) ./files/network $(1)/etc/config/network
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) ./files/mesh-config $(1)/usr/sbin
-	$(INSTALL_BIN) ./files/checketh0 $(1)/usr/sbin
+	$(INSTALL_BIN) ./files/nodeadm $(1)/usr/sbin
 	# captive portal
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/splashd $(1)/etc/init.d/
