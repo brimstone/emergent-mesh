@@ -37,6 +37,11 @@ define Package/brim-mesh/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) ./files/mesh-config $(1)/usr/sbin
 	$(INSTALL_BIN) ./files/checketh0 $(1)/usr/sbin
+	# captive portal
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/splashd $(1)/etc/init.d/
+	$(INSTALL_BIN) ./files/httpd $(1)/etc/init.d/
+	$(INSTALL_DATA) ./files/nocat.conf $(1)/etc/
 endef
 
 $(eval $(call BuildPackage,brim-mesh))

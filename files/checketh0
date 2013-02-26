@@ -53,7 +53,13 @@ if ! nolink; then
 	solid
 	isserver || batctl gw server
 	# hand out ips
-	isrunning dnsmasq ||  /etc/init.d/dnsmasq start
+	if grep -q "address=/#/" /etc/dnsmasq.conf; then
+		rm /etc/dnsmasq.conf
+		touch /etc/dnsmasq.conf
+		/etc/init.d/dnsmasq stop
+		/etc/init.d/dnsmasq start
+	fi
+	isrunning dnsmasq || /etc/init.d/dnsmasq start
 	# we're done here
 	exit
 fi
@@ -80,11 +86,16 @@ if nogateways && [ $(( $RANDOM % 10 )) = 0 ]; then
 	# become a server
 	solid
 	batctl gw server
-	# TODO fake routing
-	# TODO fake dns stuff
 	logit "now a server"
 	# start handing out IPs
+	# dnsmasq cannot be running when splashd starts. It looks up something, then fucks up everything
+	/etc/init.d/dnsmasq stop
+	/etc/init.d/splashd start
+	# we don't know anything, so become everything!
+	echo "address=/#/1.1.1.1" > /etc/dnsmasq.conf
 	/etc/init.d/dnsmasq start
+	ifconfig eth0 192.168.0.2
+	route add default gw 192.168.0.1
 	exit
 fi
 

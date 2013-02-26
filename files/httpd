@@ -1,0 +1,13 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006 OpenWrt.org 
+
+START=99
+STOP=99
+start() {
+	[ -d /var/www ] || mkdir /var/www
+	service_start /usr/sbin/httpd -h /var/www/
+}
+
+stop() {
+	service_stop /usr/sbin/httpd -h /var/www
+}
