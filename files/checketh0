@@ -37,19 +37,7 @@ logit() {
 	echo "$(date) $1" >> /tmp/checketh0
 }
 
-if ! isrouting; then
-	# set iptables rules
-	iptables -t nat -F POSTROUTING
-	iptables -t nat -A POSTROUTING -s $(ip -o addr show dev br-lan | awk '/inet / {print $4}') -j MASQUERADE
-	# set kernel forwarder
-	echo 1 > /proc/sys/net/ipv4/ip_forward
-	logit "Setting up routing"
-fi
-
-# if we have a link
-if ! nolink; then
-	logit "has a link"
-	# be a gateway
+gatewaymode() {
 	solid
 	isserver || batctl gw server
 	# hand out ips
@@ -60,30 +48,9 @@ if ! nolink; then
 		/etc/init.d/dnsmasq start
 	fi
 	isrunning dnsmasq || /etc/init.d/dnsmasq start
-	# we're done here
-	exit
-fi
+}
 
-# if we're a server
-if isserver; then
-	# so, we're a server without a link
-	# if there are other gateways on the network that aren't us
-	logit "is a server"
-	if ! nogateways; then
-		# be a client and bail
-		blink
-		batctl gw client
-		logit "has gateways"
-		exit
-	fi
-	logit "No other gateways"
-	exit
-fi
-
-# pick a random number between 0 and 9
-# if it's 0
-if nogateways && [ $(( $RANDOM % 10 )) = 0 ]; then
-	# become a server
+standalonemode() {
 	solid
 	batctl gw server
 	logit "now a server"
@@ -96,6 +63,53 @@ if nogateways && [ $(( $RANDOM % 10 )) = 0 ]; then
 	/etc/init.d/dnsmasq start
 	ifconfig eth0 192.168.0.2
 	route add default gw 192.168.0.1
+}
+
+clientmode() {
+	blink
+	batctl gw client
+	logit "now a client"
+}
+
+if ! isrouting; then
+	# set iptables rules
+	iptables -t nat -F POSTROUTING
+	iptables -t nat -A POSTROUTING -s $(ip -o addr show dev br-lan | awk '/inet / {print $4}') -j MASQUERADE
+	# set kernel forwarder
+	echo 1 > /proc/sys/net/ipv4/ip_forward
+	logit "Setting up routing"
+fi
+
+if [ "$1" = "check" ]; then
+# if we have a link
+if ! nolink; then
+	logit "has a link"
+	# be a gateway
+	gatewaymode
+	# we're done here
+	exit
+fi
+
+# if we're a server
+if isserver; then
+	# so, we're a server without a link
+	# if there are other gateways on the network that aren't us
+	logit "is a server"
+	if ! nogateways; then
+		# be a client and bail
+		clientmode
+		logit "has gateways"
+		exit
+	fi
+	logit "No other gateways"
+	exit
+fi
+
+# pick a random number between 0 and 9
+# if it's 0
+if nogateways && [ $(( $RANDOM % 10 )) = 0 ]; then
+	# become a server
+	standalonemode
 	exit
 fi
 
@@ -103,6 +117,13 @@ fi
 # we're not already a server
 # we didn't just become a server
 # make us a client
-blink
-batctl gw client
-logit "now a client"
+clientmode
+elif [ "$1" = "gateway" ]; then
+	gatewaymode
+elif [ "$1" = "standalone" ]; then
+	standalonemode
+elif [ "$1" = "client" ]; then
+	clientmode
+else
+	echo "Usage: $0 <check|gateway|server|client>"
+fi
