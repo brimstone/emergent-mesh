@@ -4,10 +4,10 @@
 START=99
 STOP=99
 start() {
-	[ -d /var/www ] || mkdir /var/www
-	service_start /usr/sbin/httpd -h /var/www/
+	[ -d /www ] || mkdir /www
+	service_start /usr/sbin/httpd -c /etc/httpd.conf
 }
 
 stop() {
-	service_stop /usr/sbin/httpd -h /var/www
+	service_stop /usr/sbin/httpd
 }

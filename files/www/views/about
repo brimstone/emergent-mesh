@@ -1,0 +1,6 @@
+#!/bin/sh
+header
+cat << EOF
+	stuff and things, more text probably
+EOF
+footer

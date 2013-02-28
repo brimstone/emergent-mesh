@@ -124,6 +124,21 @@ elif [ "$1" = "standalone" ]; then
 	standalonemode
 elif [ "$1" = "client" ]; then
 	clientmode
+elif [ "$1" = "mode" ]; then
+	if ! nolink && isserver; then
+		echo "Gateway"
+		exit
+	fi
+	if isserver; then
+		echo "Standalone"
+		exit
+	fi
+	if isclient; then
+		echo "Client"
+		exit
+	fi
+	echo "Unknown"
+	exit
 else
-	echo "Usage: $0 <check|gateway|server|client>"
+	echo "Usage: $0 <check|gateway|standalone|client|mode>"
 fi
