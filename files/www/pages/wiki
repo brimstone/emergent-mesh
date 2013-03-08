@@ -1,0 +1,41 @@
+#!/bin/sh
+if [ "$REQUEST_METHOD" = "POST" ]; then
+	POST_page="$(echo "$POST_page" | sed -e 's/\.\.\///g')"
+	httpd -d "$POST_content" > /wiki/$POST_page
+	echo "Status: 302 Temporary Redirect"
+	echo "Location: /wiki/$POST_page/"
+	exit
+fi
+include "header"
+cat << dog
+<div id="wmd-preview" class="wmd-panel wmd-preview"></div>
+[ <a href="#" id="btnEdit"> edit </a> ]
+<form method="post" action="/wiki/">
+<input type="hidden" name="page" value="$method" />
+<div id="wmd-editor" class="wmd-panel">
+	<div id="wmd-button-bar"></div>
+	<textarea class="wmd-input" id="wmd-input" name="content">
+dog
+if [ -s /wiki/$method ]; then
+	cat /wiki/$method
+else
+	cat << dog
+There is no text here.
+dog
+fi
+cat << dog
+</textarea>
+<input type="submit" value="Save" />
+</div>
+</form>
+<script>
+
+\$(function() {
+	\$("#btnEdit").click(function() { \$("#wmd-editor").toggle(); });
+	var converter1 = new Markdown.Converter();
+	var editor1 = new Markdown.Editor(converter1);
+	editor1.run();
+});
+</script>
+dog
+include "footer"

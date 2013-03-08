@@ -1,0 +1,40 @@
+#!/bin/sh
+if [ "$method" != "index" ]; then
+	echo "Content-type: application/json"
+	echo
+fi
+
+if [ "$method" = "status" ]; then
+	. /usr/share/libubox/jshn.sh
+	json_init
+	json_add_string mode "$(nodeadm mode)"
+	json_add_object flash
+		json_add_string used "$(df /overlay | awk '/^\// { print $4}')"
+		json_add_string total "$(df /overlay | awk '/^\// { print $2}')"
+	json_close_object
+	json_add_object memory
+		json_add_string used "$(free -m | awk '/^Mem/ {print $3}')"
+		json_add_string total "$(free -m | awk '/^Mem/ {print $2}')"
+	json_close_object
+	json_dump
+	exit;
+elif [ "$method" = "mode" ]; then
+	if [ "$param" = "client" -o "$param" = "standalone" -o "$param" = "gateway" ]; then
+		nodeadm "$param"
+		if [ $? = 0 ]; then
+			echo '{ "status" : "success" }'
+		else
+			echo '{ "status" : "error" }'
+		fi
+	else
+		echo '{ "status" : "error" }'
+	fi
+elif [ "$method" = "time" ]; then
+	param=$(echo "$param" | sed -e 's/[0-1]//g')
+	date -s "$param"
+	if [ $? = 0 ]; then
+		echo '{ "status" : "success" }'
+	else
+		echo '{ "status" : "error" }'
+	fi
+fi

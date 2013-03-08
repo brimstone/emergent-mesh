@@ -1,0 +1,6 @@
+cat << dog
+	<hr>
+</div> <!-- /container -->
+</body>
+</html>
+dog
