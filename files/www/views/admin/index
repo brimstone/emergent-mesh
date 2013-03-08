@@ -1,0 +1,62 @@
+<h1>Mesh</h1>
+<input type="button" class="btn btn-primary meshmode" id="gateway" value="Gateway" />
+<input type="button" class="btn btn-primary meshmode" id="standalone" value="Standalone" />
+<input type="button" class="btn btn-primary meshmode" id="client" value="Client" />
+
+<h1>Node $HOST</h1>
+<div class="row">
+	<div class="span2"><b>Flash</b></div>
+	<div class="span8"><div id="pbarFlash" class="progressbar"></div></div>
+</div>
+<div class="row">
+	<div class="span2"><b>Memory</b></div>
+	<div class="span8"><div id="pbarMemory" class="progressbar"></div></div>
+</div>
+
+<h1>NoDogSplash</h1>
+<pre>
+$(ndsctl status)
+</pre>
+
+<h1>Env</h1>
+<pre>
+$(env | sort)
+</pre>
+
+<script>
+function getstatus() {
+	$.getJSON('/admin/status/', function(data) {
+		\$(".btn-success, .meshmode").removeClass("btn-success").addClass("btn-primary");
+		\$("#" + data.mode.toLowerCase()).removeClass("btn-primary").addClass("btn-success");
+		\$("#pbarMemory").progressbar('setMaximum', data.memory.total);
+		\$("#pbarMemory").progressbar('setPosition', data.memory.used);
+		\$("#pbarFlash").progressbar('setMaximum', data.flash.total);
+		\$("#pbarFlash").progressbar('setPosition', data.flash.used);
+	});
+}
+\$(function() {
+	\$(".btn").click(function() {
+		$.getJSON('/admin/mode/' + \$(this).val().toLowerCase() + '/', function(data) {
+			console.log(data);
+			getstatus();
+		});
+	});
+
+	\$("#pbarMemory").progressbar();
+	\$("#pbarFlash").progressbar();
+
+	setInterval(getstatus, 2000);
+	\$("#btnTime").click(function() {
+	});
+	var d = new Date();
+	var s = parseInt(d.getTime() / 1000) - $(date +%s);
+	console.log("Time is " + (s - $(date +%s)) + " seconds off");
+	\$("body > .container").prepend('<div class="alert alert-error"><button type="button" class="close" data-dismiss="alert">&times;</button>Time is ' + s + ' seconds off.<input type="button" class="btn" id="btnTime" value="Fix it!"/></div>');
+	\$("#btnTime").click(function() {
+		var d = new Date();
+		$.getJSON("/admin/time/" + parseInt(d.getTime() / 1000) + "/", function(data) {
+			console.log(data);
+		});
+	});
+});
+</script>
