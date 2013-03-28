@@ -13,9 +13,9 @@
 	<div class="span8"><div id="pbarMemory" class="progressbar"></div></div>
 </div>
 
-<h1>NoDogSplash</h1>
+<h1>Captive Portal</h1>
 <pre>
-$(ndsctl status)
+TODO
 </pre>
 
 <h1>Env</h1>
@@ -25,7 +25,7 @@ $(env | sort)
 
 <script>
 function getstatus() {
-	$.getJSON('/admin/status/', function(data) {
+	$.getJSON('/admin/status', function(data) {
 		\$(".btn-success, .meshmode").removeClass("btn-success").addClass("btn-primary");
 		\$("#" + data.mode.toLowerCase()).removeClass("btn-primary").addClass("btn-success");
 		\$("#pbarMemory").progressbar('setMaximum', data.memory.total);
@@ -36,7 +36,7 @@ function getstatus() {
 }
 \$(function() {
 	\$(".btn").click(function() {
-		$.getJSON('/admin/mode/' + \$(this).val().toLowerCase() + '/', function(data) {
+		$.getJSON('/admin/mode/' + \$(this).val().toLowerCase(), function(data) {
 			console.log(data);
 			getstatus();
 		});
