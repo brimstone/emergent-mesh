@@ -31,8 +31,11 @@ export param="$url"
 # if we have a page or a view for the page/method
 if [ -f "$WWWROOT/pages/$page" -o -f "$WWWROOT/views/$page/$method" ]; then
 	if [ "$REQUEST_METHOD" = "POST" ]; then
-		read userinput
-		eval $(echo "$userinput"|awk -F'&' '{for(i=1;i<=NF;i++){print "export POST_" $i}}')
+		read POSTRAW
+		export POSTRAW
+		if [ "${POSTRAW:0:1}" != "{" ]; then
+			eval $(echo "$POSTRAW" | awk -F'&' '{for(i=1;i<=NF;i++){print "export POST_" $i}}')
+		fi
 	fi
 	# build up a tiny driver script
 	(
