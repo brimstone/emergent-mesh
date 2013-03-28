@@ -1,0 +1,13 @@
+if [ "$QUERY_STRING" = "/library/test/success.html" ]; then
+	# Check for user
+	# if found send success page
+	echo "Content-type: text/html"
+	echo
+	echo "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>"
+	# else send redirect
+	echo "Status: 302 Temporary Redirect"
+	echo "Location: /about"
+else
+	echo "Status: 302 Temporary Redirect"
+	echo "Location: /"
+fi
