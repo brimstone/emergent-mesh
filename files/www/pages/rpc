@@ -1,0 +1,72 @@
+if [ -z "$POSTRAW" ]; then
+	echo "Status: 302"
+	echo "Location: /"
+fi
+
+# see if we can load our post data
+. /usr/share/libubox/jshn.sh
+json_load "$POSTRAW"
+json_get_vars jsonrpc method id
+# TODO something with params
+
+# obviously we're going to return a proper json object from here on
+json_init
+json_add_string "jsonrpc" "2.0"
+json_add_string "id" "$id"
+
+if [ "$jsonrpc" != "2.0" ]; then
+	echo "Content-type: application/json"
+	echo
+	json_add_object "error"
+		json_add_int "code" -32600
+		json_add_string "message" "Invalid JSON-RPC 2.0"
+	json_close_object
+	json_dump
+	exit
+fi
+
+case "$method" in
+
+"rpc.listMethods")
+	json_add_object "result"
+		json_add_array "rpc"
+			json_add_string "" "listMethods"
+		json_close_array
+		json_add_array "system"
+			json_add_string "" "status"
+		json_close_array
+	json_close_object
+	exit 0
+	;;
+
+"system.status")
+	json_add_object "result"
+		json_add_string mode "$(nodeadm mode)"
+		json_add_object flash
+			json_add_string used "$(df /overlay | awk '/^\// { print $4}')"
+			json_add_string total "$(df /overlay | awk '/^\// { print $2}')"
+		json_close_object
+		json_add_object memory
+			json_add_string used "$(free -m | awk '/^Mem/ {print $3}')"
+			json_add_string total "$(free -m | awk '/^Mem/ {print $2}')"
+		json_close_object
+	json_close_object
+	exit 0
+	;;
+
+"board.post")
+	json_add_object "result"
+		json_add_string mode "$(nodeadm mode)"
+		json_add_object flash
+			json_add_string used "$(df /overlay | awk '/^\// { print $4}')"
+			json_add_string total "$(df /overlay | awk '/^\// { print $2}')"
+		json_close_object
+		json_add_object memory
+			json_add_string used "$(free -m | awk '/^Mem/ {print $3}')"
+			json_add_string total "$(free -m | awk '/^Mem/ {print $2}')"
+		json_close_object
+	json_close_object
+	exit 0
+	;;
+esac
+json_dump
