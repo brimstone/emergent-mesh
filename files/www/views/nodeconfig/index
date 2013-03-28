@@ -1,0 +1,2 @@
+export PUBLIC_ESSID="$(uci get wireless.@wifi-iface[0].ssid)"
+export PUBLIC_BSSID="$(uci get wireless.@wifi-iface[0].bssid)"
