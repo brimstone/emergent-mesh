@@ -1,15 +1,11 @@
-#!/bin/sh
-
-nolink() {
-	ethtool eth0 | grep -q "Link detected: no"
-}
+#!/bin/ash
 
 isclient() {
-	batctl gw | grep -q "client"
+	batctl gw 2>/dev/null | grep -q "client"
 }
 
 isserver() {
-	batctl gw | grep -q "server"
+	batctl gw 2>/dev/null | grep -q "server"
 }
 
 nogateways() {
@@ -28,18 +24,18 @@ solid() {
 	echo "default-on" > /sys/devices/platform/leds-gpio/leds/tp-link\:blue\:system/trigger
 }
 
-
 isrouting() {
 	iptables -t nat -vnL | grep -q MASQ
 }
 
 logit() {
+	echo "$1"
 	echo "$(date) $1" >> /tmp/node.log
 }
 
 gatewaymode() {
 	solid
-	isserver || batctl gw server
+	isserver || batctl gw server || return
 	# hand out ips
 	if grep -q "address=/#/" /etc/dnsmasq.conf; then
 		rm /etc/dnsmasq.conf
@@ -48,28 +44,25 @@ gatewaymode() {
 		/etc/init.d/dnsmasq start
 	fi
 	isrunning dnsmasq || /etc/init.d/dnsmasq start
-	/etc/init.d/nodogsplash start
 }
 
 standalonemode() {
 	solid
-	batctl gw server
+	batctl gw server || return
 	logit "now a server"
 	# start handing out IPs
 	/etc/init.d/dnsmasq stop
 	# we don't know anything, so become everything!
 	echo "address=/#/1.1.1.1" > /etc/dnsmasq.conf
 	/etc/init.d/dnsmasq start
-	/etc/init.d/nodogsplash start
 	ifconfig eth0 192.168.0.2
 	route add default gw 192.168.0.1
 }
 
 clientmode() {
 	blink
-	batctl gw client
+	batctl gw client || return
 	/etc/init.d/dnsmasq stop
-	/etc/init.d/nodogsplash stop
 	logit "now a client"
 }
 
@@ -78,18 +71,18 @@ config() {
 ### Another VAP in adhoc mode is added to main radio0.
 
 ### Node-specific settings
-read -p "Hostname: " HOSTNAME
-read -p "IP: " IP
+[ -z "$HOSTNAME" ] && read -p "Hostname: " HOSTNAME
+[ -z "$IP" ] && read -p "IP: " IP
 
 ### These parameters should be consistent across all nodes
-export NETMASK="255.255.252.0" 
+[ -z "$NETMASK" ] && read -p "Netmask: " NETMASK 
+[ -z "$PUBLIC_BSSID" ] && read -p "Public BSSID (hex): " PUBLIC_BSSID
+[ -z "$PUBLIC_ESSID" ] && read -p "Public ESSID (text): " PUBLIC_ESSID
+[ -z "$ADHOC0_BSSID" ] && read -p "Ad-Hoc BSSID (hex): " ADHOC0_BSSID
+[ -z "$ADHOC0_ESSID" ] && read -p "Ad-Hoc ESSID (text): " ADHOC0_ESSID
+[ -z "$ADHOC0_CHANNEL" ] && read -p "Ad-Hoc Channel: " ADHOC0_CHANNEL
 export DNS="" 
 export GATEWAY="" 
-export PUBLIC_ESSID="The Mesh"
-export PUBLIC_BSSID="DE:AD:BE:EF:CA:FE"
-export ADHOC0_BSSID="CA:CA:CA:CA:CA:00" 
-export ADHOC0_ESSID="meshtrunk"
-export ADHOC0_CHANNEL="1" 
 
 ### Ensure of populating /etc/config/wireless with 
 ### autodetected wifi-device entries (radioX)
@@ -154,7 +147,54 @@ commit" \
 | uci batch
 }
 
-if [ "$1" = "check" ]; then
+search() {
+	# cd /tmp; rm nodeadm; wget http://192.168.1.2/nodeadm ; chmod 755 nodeadm
+	logit "Searching for open ad-hoc networks"
+	uci set wireless.radio0.disabled=0
+	wifi
+	sleep 5
+	networkinfo="$(aps | grep "OPN Ad-Hoc")"
+	c=$(echo "$networkinfo" | wc -l)
+	logit "found: $networkinfo"
+	if [ -z "$networkinfo" ]; then
+		logit "No ad-hoc networks found, come back later"
+		exit 1
+	fi
+	if [ $c -gt 1 ]; then
+		logit "Many ad-hoc networks found, write the bits of $0 that can figure out how to handle this"
+		exit 1
+	fi
+	export ADHOC0_BSSID=$(echo "$networkinfo" | awk '{print $1}')
+	export ADHOC0_CHANNEL=$(echo "$networkinfo" | awk '{print $2}')
+	export ADHOC0_ESSID=$(echo "$networkinfo" | sed "s/$ADHOC0_BSSID $ADHOC0_CHANNEL OPN Ad-Hoc //")
+	killall hostapd
+	ifconfig wlan0 up
+	sleep 2
+	iwconfig wlan0 mode ad-hoc essid "$ADHOC0_ESSID" channel "$ADHOC0_CHANNEL" ap "$ADHOC0_BSSID"
+	ifconfig wlan0 up
+	batctl if add wlan0
+	udhcpc -i bat0
+	export IP="$(ifconfig bat0 | awk '/inet/ {sub(/addr:/, "", $2); print $2}')"
+	export NETMASK="$(ifconfig bat0 | awk '/inet/ {sub(/Mask:/, "", $4); print $4}')"
+}
+
+getmode() {
+	if ! senselink && isserver; then
+		echo "Gateway"
+		exit
+	fi
+	if isserver; then
+		echo "Standalone"
+		exit
+	fi
+	if isclient; then
+		echo "Client"
+		exit
+	fi
+	echo "Unknown"
+}
+case "$1" in
+'check')
 
 MYNET="$(ip -o addr show dev br-lan | awk '/inet / {print $4}')"
 MYIP="${MYNET%%/*}"
@@ -167,27 +207,9 @@ if ! isrouting; then
 	logit "Setting up routing"
 fi
 
-if ! grep -q "$MYIP" /etc/nodogsplash/nodogsplash.conf; then
-	sed -i "/FirewallRuleSet preauthenticated-users/ a FirewallRule allow tcp port 80 to $MYIP" /etc/nodogsplash/nodogsplash.conf
-	/etc/init.d/nodogsplash stop
-	/etc/init.d/nodogsplash start
-fi
-
 HOST="$(uci get system.@system[0].hostname)"
-if ! grep -q "$HOST" /etc/nodogsplash/htdocs/splash.html; then
-	cat << dog > /etc/nodogsplash/htdocs/splash.html
-<html>
-<head>
-<meta http-equiv="refresh" content="0;URL='http://$HOST.mesh/'">
-</head>
-<body>
-</body>
-</html>
-dog
-fi
-
 # if we have a link
-if ! nolink; then
+if ! senselink; then
 	logit "has a link"
 	# be a gateway
 	gatewaymode
@@ -210,9 +232,9 @@ if isserver; then
 	exit
 fi
 
-# pick a random number between 0 and 9
+# pick a random number between 0 and 2
 # if it's 0
-if nogateways && [ $(( $RANDOM % 10 )) = 0 ]; then
+if nogateways && [ $(( $RANDOM % 3 )) = 0 ]; then
 	# become a server
 	standalonemode
 	exit
@@ -223,29 +245,45 @@ fi
 # we didn't just become a server
 # make us a client
 clientmode
-elif [ "$1" = "gateway" ]; then
+	exit 0
+	;;
+'gateway')
 	gatewaymode
-elif [ "$1" = "standalone" ]; then
+	exit 0
+	;;
+'standalone')
 	standalonemode
-elif [ "$1" = "client" ]; then
+	exit 0
+	;;
+'client')
 	clientmode
-elif [ "$1" = "mode" ]; then
-	if ! nolink && isserver; then
-		echo "Gateway"
-		exit
-	fi
-	if isserver; then
-		echo "Standalone"
-		exit
-	fi
-	if isclient; then
-		echo "Client"
-		exit
-	fi
-	echo "Unknown"
-	exit
-elif [ "$1" = "config" ]; then
+	exit 0
+	;;
+'mode')
+	getmode
+	exit 0
+	;;
+'config')
 	config
-else
-	echo "Usage: $0 <check|gateway|standalone|client|mode|config>"
-fi
+	exit 0
+	;;
+'search')
+	search
+	# get the config from the main router
+	masternode=$(ip route get 1.1.1.1 | awk '{print $3}')
+	# TODO call config with values from json thingy at /node.config i guess?
+	$(wget http://$masternode/nodeconfig -O -)
+	export HOSTNAME="node"
+	if [ -z "$PUBLIC_ESSID" ]; then
+		logit "Auto configuration failed"
+		exit 1
+	fi
+	config
+	clientmode
+	# TODO write /node.config
+	exit 0
+	;;
+esac
+
+echo "Usage: $0 <check|gateway|standalone|client|mode|config>"
+exit 1
