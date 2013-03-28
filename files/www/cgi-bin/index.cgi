@@ -6,6 +6,8 @@ export WWWROOT="/www"
 export MYNET="$(ip -o addr show dev br-lan | awk '/inet / {print $4}')"
 export MYIP="${MYNET%%/*}"
 
+echo "$REMOTE_ADDR - - $(date +"[%d/%b/%Y:%H:%M:%S %z]") \"$REQUEST_METHOD $QUERY_STRING\" \"$HTTP_USER_AGENT\"" >> /tmp/httpd.log
+
 # figure out our page
 url=$(echo "$QUERY_STRING" | sed -e 's/\.\.//g')
 url="${url%%/}"
