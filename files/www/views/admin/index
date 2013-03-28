@@ -24,17 +24,22 @@ $(env | sort)
 </pre>
 
 <script>
+var rpc;
 function getstatus() {
-	$.getJSON('/admin/status', function(data) {
+	rpc.system.status("", function(d) {
+		s=d.result;
 		\$(".btn-success, .meshmode").removeClass("btn-success").addClass("btn-primary");
-		\$("#" + data.mode.toLowerCase()).removeClass("btn-primary").addClass("btn-success");
-		\$("#pbarMemory").progressbar('setMaximum', data.memory.total);
-		\$("#pbarMemory").progressbar('setPosition', data.memory.used);
-		\$("#pbarFlash").progressbar('setMaximum', data.flash.total);
-		\$("#pbarFlash").progressbar('setPosition', data.flash.used);
+		\$("#" + s.mode.toLowerCase()).removeClass("btn-primary").addClass("btn-success");
+		\$("#pbarMemory").progressbar('setMaximum', s.memory.total);
+		\$("#pbarMemory").progressbar('setPosition', s.memory.used);
+		\$("#pbarFlash").progressbar('setMaximum', s.flash.total);
+		\$("#pbarFlash").progressbar('setPosition', s.flash.used);
 	});
 }
 \$(function() {
+
+	rpc = new jsonrpcphp('/rpc', function() {});
+
 	\$(".btn").click(function() {
 		$.getJSON('/admin/mode/' + \$(this).val().toLowerCase(), function(data) {
 			console.log(data);
