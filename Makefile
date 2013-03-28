@@ -1,13 +1,6 @@
-#
-# Copyright (C) 2006-2012 OpenWrt.org
-#
-# This is free software, licensed under the GNU General Public License v2.
-# See /LICENSE for more information.
-#
-
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=brim-mesh
+PKG_NAME:=emergent-mesh
 PKG_RELEASE:=2013-02-27
 
 PKG_LICENSE:=GPLv3
@@ -15,27 +8,31 @@ PKG_LICENSE_FILES:=
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/brim-mesh
+define Package/emergent-mesh
   SECTION:=utils
-  CATEGORY:=Base system
-  TITLE:=Files for Brimstone's Mesh Firmware
+  CATEGORY:=Emergent Mesh
+  TITLE:=Files for Emergent Mesh firmware
 endef
 
-define Build/Compile
-	true
+define Package/emergent-mesh/description
+ Provides file for Emergent Mesh firmwares.
 endef
 
-define Package/brim-mesh/description
- Provides file for brimstone's mesh firmwares.
+define Build/Prepare
+	mkdir -p $(PKG_BUILD_DIR)
+	$(CP) ./src/* $(PKG_BUILD_DIR)/
 endef
 
-define Package/brim-mesh/install
+define Package/emergent-mesh/install
 	$(INSTALL_DIR) $(1)/etc/crontabs
 	$(INSTALL_DATA) ./files/crontab $(1)/etc/crontabs/root
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DATA) ./files/network $(1)/etc/config/network
 	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/senselink $(1)/usr/sbin/
 	$(INSTALL_BIN) ./files/nodeadm $(1)/usr/sbin
+	$(INSTALL_BIN) ./files/aps $(1)/usr/sbin
+	$(INSTALL_BIN) ./files/captive-portal $(1)/usr/sbin
 	# http stuff
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/httpd $(1)/etc/init.d/
@@ -44,4 +41,4 @@ define Package/brim-mesh/install
 	mkdir $(1)/wiki
 endef
 
-$(eval $(call BuildPackage,brim-mesh))
+$(eval $(call BuildPackage,emergent-mesh))
