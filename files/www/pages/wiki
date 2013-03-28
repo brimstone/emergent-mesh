@@ -3,14 +3,25 @@ if [ "$REQUEST_METHOD" = "POST" ]; then
 	POST_page="$(echo "$POST_page" | sed -e 's/\.\.\///g')"
 	httpd -d "$POST_content" > /wiki/$POST_page
 	echo "Status: 302 Temporary Redirect"
-	echo "Location: /wiki/$POST_page/"
+	if [ "$POST_page" = "index" ]; then
+		echo "Location: /wiki"
+	else
+		echo "Location: /wiki/$POST_page"
+	fi
 	exit
 fi
 include "header"
 cat << dog
-<div id="wmd-preview" class="wmd-panel wmd-preview"></div>
-[ <a href="#" id="btnEdit"> edit </a> ]
-<form method="post" action="/wiki/">
+<ul class="nav nav-tabs">
+	<li class="active"><a href="#page" data-toggle="tab">Page</a></li>
+	<li><a href="#edit" data-toggle="tab">Edit</a></li>
+</ul>
+<div class="tab-content">
+	<div class="tab-pane active" id="page">
+		<div id="wmd-preview" class="wmd-panel wmd-preview"></div>
+	</div>
+	<div class="tab-pane" id="edit">
+<form method="post" action="/wiki">
 <input type="hidden" name="page" value="$method" />
 <div id="wmd-editor" class="wmd-panel">
 	<div id="wmd-button-bar"></div>
@@ -28,10 +39,11 @@ cat << dog
 <input type="submit" value="Save" />
 </div>
 </form>
+	</div>
+</div>
 <script>
 
 \$(function() {
-	\$("#btnEdit").click(function() { \$("#wmd-editor").toggle(); });
 	var converter1 = new Markdown.Converter();
 	var editor1 = new Markdown.Editor(converter1);
 	editor1.run();
