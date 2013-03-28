@@ -27,15 +27,16 @@ Content-type: text/html
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="brand" href="/">Emergent Node $HOST</a>
-			<div class="nav-collapse collapse">
+			<ul class="nav">
+				<li$([ "$page" = "default" ] && echo ' class="active"')><a href="/">Home</a></li>
+				<li$([ "$page" = "about" ] && echo ' class="active"')>$(link About about)</li>
+				<li$([ "$page" = "contact" ] && echo ' class="active"')>$(link Contact contact)</li>
+				<li$([ "$page" = "board" ] && echo ' class="active"')>$(link "Message Board" board)</li>
+				<li$([ "$page" = "chat" ] && echo ' class="active"')>$(link Chat chat)</li>
+				<li$([ "$page" = "wiki" ] && echo ' class="active"')>$(link Resources wiki)</li>
+			</ul>
+		<div class="nav-collapse collapse">
 				<ul class="nav">
-					<li$([ "$page" = "default" ] && echo ' class="active"')><a href="/">Home</a></li>
-					<li$([ "$page" = "about" ] && echo ' class="active"')>$(link About about)</li>
-					<li$([ "$page" = "contact" ] && echo ' class="active"')>$(link Contact contact)</li>
-					<li$([ "$page" = "board" ] && echo ' class="active"')>$(link "Message Board" board)</li>
-					<li$([ "$page" = "chat" ] && echo ' class="active"')>$(link Chat chat)</li>
-					<li$([ "$page" = "wiki" ] && echo ' class="active"')>$(link Resources wiki)</li>
 					<li$([ "$page" = "admin" ] && echo ' class="active"')>$(link Admin admin)</li>
 				</ul>
 			</div><!--/.nav-collapse -->
