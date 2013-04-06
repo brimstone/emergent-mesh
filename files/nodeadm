@@ -44,6 +44,7 @@ gatewaymode() {
 		/etc/init.d/dnsmasq start
 	fi
 	isrunning dnsmasq || /etc/init.d/dnsmasq start
+	writeservice gateway
 }
 
 standalonemode() {
@@ -57,6 +58,7 @@ standalonemode() {
 	/etc/init.d/dnsmasq start
 	ifconfig eth0 192.168.0.2
 	route add default gw 192.168.0.1
+	writeservice standalone
 }
 
 clientmode() {
@@ -64,6 +66,7 @@ clientmode() {
 	batctl gw client || return
 	/etc/init.d/dnsmasq stop
 	logit "now a client"
+	writeservice client
 }
 
 config() {
@@ -98,6 +101,7 @@ uci import -m batman-adv </dev/null
 
 echo " 
 set system.@system[0].hostname=$HOSTNAME
+set system.@timeserver[0].enable_server=1
 set dhcp.@dnsmasq[0].domain=mesh
 
 set batman-adv.bat0=mesh
@@ -145,6 +149,8 @@ set wireless.@wifi-iface[-1].hidden=true
 
 commit" \
 | uci batch
+echo "export PUBLIC_ESSID=\"$PUBLIC_ESSID\"" > /www/nodeconfig
+echo "export PUBLIC_BSSID=\"$PUBLIC_BSSID\"" >> /www/nodeconfig
 }
 
 search() {
@@ -170,16 +176,23 @@ search() {
 	killall hostapd
 	ifconfig wlan0 up
 	sleep 2
+	logit "Configuring wlan0 with mode ad-hoc essid \"$ADHOC0_ESSID\" channel \"$ADHOC0_CHANNEL\" ap \"$ADHOC0_BSSID\""
 	iwconfig wlan0 mode ad-hoc essid "$ADHOC0_ESSID" channel "$ADHOC0_CHANNEL" ap "$ADHOC0_BSSID"
-	ifconfig wlan0 up
+	logit "Bringing up interfaces"
+	ifconfig wlan0 mtu 1528 up
 	batctl if add wlan0
-	udhcpc -i bat0
-	export IP="$(ifconfig bat0 | awk '/inet/ {sub(/addr:/, "", $2); print $2}')"
-	export NETMASK="$(ifconfig bat0 | awk '/inet/ {sub(/Mask:/, "", $4); print $4}')"
+	brctl addif br-lan bat0
+	ifconfig bat0 up
+	sleep 2
+	logit "Trying to get an ip for br-lan"
+	udhcpc -T 2 -t 30 -A 2 -i br-lan | tee -a /tmp/node.log
+	export IP="$(ifconfig br-lan | awk '/inet/ {sub(/addr:/, "", $2); print $2}')"
+	export NETMASK="$(ifconfig br-lan | awk '/inet/ {sub(/Mask:/, "", $4); print $4}')"
+	logit "Got $IP/$NETMASK"
 }
 
 getmode() {
-	if ! senselink && isserver; then
+	if senselink && isserver; then
 		echo "Gateway"
 		exit
 	fi
@@ -193,9 +206,38 @@ getmode() {
 	fi
 	echo "Unknown"
 }
+writeservice() {
+	mode="$1"
+	cat > /etc/avahi/services/mesh.service << dog
+<?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+<service-group>
+ <name replace-wildcards="yes">Mesh Node on %h</name>
+  <service>
+   <type>_mesh._tcp</type>
+   <port>0</port>
+   <txt-record>mode=$1</txt-record>
+  </service>
+</service-group>
+dog
+/etc/init.d/avahi-daemon restart
+}
 case "$1" in
 'check')
-
+if [ -z "$(uci get wireless.@wifi-iface[0].bssid 2>/dev/null)" ]; then
+	search
+	# get the config from the main router
+	masternode=$(ip route get 1.1.1.1 | awk '{print $3}')
+	# call config with values from json thingy at /node.config
+	eval $(wget http://$masternode/nodeconfig -O -)
+	export HOSTNAME="node"
+	if [ -z "$PUBLIC_ESSID" ]; then
+		logit "Auto configuration failed"
+		exit 1
+	fi
+	config
+	reboot
+fi
 MYNET="$(ip -o addr show dev br-lan | awk '/inet / {print $4}')"
 MYIP="${MYNET%%/*}"
 if ! isrouting; then
@@ -209,7 +251,7 @@ fi
 
 HOST="$(uci get system.@system[0].hostname)"
 # if we have a link
-if ! senselink; then
+if senselink; then
 	logit "has a link"
 	# be a gateway
 	gatewaymode
@@ -265,22 +307,6 @@ clientmode
 	;;
 'config')
 	config
-	exit 0
-	;;
-'search')
-	search
-	# get the config from the main router
-	masternode=$(ip route get 1.1.1.1 | awk '{print $3}')
-	# TODO call config with values from json thingy at /node.config i guess?
-	$(wget http://$masternode/nodeconfig -O -)
-	export HOSTNAME="node"
-	if [ -z "$PUBLIC_ESSID" ]; then
-		logit "Auto configuration failed"
-		exit 1
-	fi
-	config
-	clientmode
-	# TODO write /node.config
 	exit 0
 	;;
 esac

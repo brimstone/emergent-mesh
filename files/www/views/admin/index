@@ -1,16 +1,24 @@
 <h1>Mesh</h1>
-<input type="button" class="btn btn-primary meshmode" id="gateway" value="Gateway" />
-<input type="button" class="btn btn-primary meshmode" id="standalone" value="Standalone" />
-<input type="button" class="btn btn-primary meshmode" id="client" value="Client" />
+<input type="button" class="btn btn-{{(status.mode == 'Gateway') && 'success' || 'primary'}} meshmode" id="gateway" value="Gateway" />
+<input type="button" class="btn btn-{{(status.mode == 'Standalone') && 'success' || 'primary'}} meshmode" id="standalone" value="Standalone" />
+<input type="button" class="btn btn-{{(status.mode == 'Client') && 'success' || 'primary'}} meshmode" id="client" value="Client" />
 
 <h1>Node $HOST</h1>
 <div class="row">
 	<div class="span2"><b>Flash</b></div>
-	<div class="span8"><div id="pbarFlash" class="progressbar"></div></div>
+	<div class="span8">
+		<div class="progress">
+			<div class="bar" style="width: {{status.flash.used / status.flash.total * 100}}%;"></div>
+		</div>
+	</div>
 </div>
 <div class="row">
 	<div class="span2"><b>Memory</b></div>
-	<div class="span8"><div id="pbarMemory" class="progressbar"></div></div>
+	<div class="span8">
+		<div class="progress">
+			<div class="bar" style="width: {{status.memory.used / status.memory.total * 100}}%;"></div>
+		</div>
+	</div>
 </div>
 
 <h1>Captive Portal</h1>
@@ -18,41 +26,28 @@
 TODO
 </pre>
 
+<h1>Other Nodes</h1>
+<table class="table table-bordered table-hover">
+<tr>
+	<th>Hostname</th>
+	<th>IP</th>
+	<th>Mode</th>
+</tr>
+$(avahi-browse -ltrap | awk '/=;br-lan.*_mesh/' | while read anode; do
+echo "	<tr>"
+echo "		<td>$(echo "$anode" | awk -F\; '{print $7}')</td>"
+echo "		<td>$(echo "$anode" | awk -F\; '{print $8}')</td>"
+echo "		<td>$(echo "$anode" | awk -F\; '{sub(/"mode=/, "", $10); sub(/"/, "", $10); print $10}')</td>"
+echo "	</tr>"
+done)
+</table>
 <h1>Env</h1>
 <pre>
 $(env | sort)
 </pre>
 
 <script>
-var rpc;
-function getstatus() {
-	rpc.system.status("", function(d) {
-		s=d.result;
-		\$(".btn-success, .meshmode").removeClass("btn-success").addClass("btn-primary");
-		\$("#" + s.mode.toLowerCase()).removeClass("btn-primary").addClass("btn-success");
-		\$("#pbarMemory").progressbar('setMaximum', s.memory.total);
-		\$("#pbarMemory").progressbar('setPosition', s.memory.used);
-		\$("#pbarFlash").progressbar('setMaximum', s.flash.total);
-		\$("#pbarFlash").progressbar('setPosition', s.flash.used);
-	});
-}
 \$(function() {
-
-	rpc = new jsonrpcphp('/rpc', function() {});
-
-	\$(".btn").click(function() {
-		$.getJSON('/admin/mode/' + \$(this).val().toLowerCase(), function(data) {
-			console.log(data);
-			getstatus();
-		});
-	});
-
-	\$("#pbarMemory").progressbar();
-	\$("#pbarFlash").progressbar();
-
-	setInterval(getstatus, 2000);
-	\$("#btnTime").click(function() {
-	});
 	var d = new Date();
 	var s = parseInt(d.getTime() / 1000) - $(date +%s);
 	console.log("Time is " + (s - $(date +%s)) + " seconds off");
@@ -64,4 +59,13 @@ function getstatus() {
 		});
 	});
 });
+
+angular.module('WebUI', ['ngResource']);
+function PageCtrl(\$scope, \$resource) {
+	\$scope.admin = \$resource('/admin/:action');
+	\$scope.update = function () {
+		\$scope.status = \$scope.admin.get({action: "status"});
+	}
+	setInterval(\$scope.update, 5000);
+}
 </script>

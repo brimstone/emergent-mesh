@@ -15,5 +15,5 @@ config interface wan
 config interface lan
 	option type 	bridge
 	option proto	static
-	option ipaddr	172.16.0.1
-	option netmask	255.255.252.0
+	option ipaddr	172.16.254.1
+	option netmask	255.255.255.0

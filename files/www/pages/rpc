@@ -1,6 +1,7 @@
 if [ -z "$POSTRAW" ]; then
 	echo "Status: 302"
 	echo "Location: /"
+	exit;
 fi
 
 # see if we can load our post data
@@ -13,6 +14,7 @@ json_get_vars jsonrpc method id
 json_init
 json_add_string "jsonrpc" "2.0"
 json_add_string "id" "$id"
+
 
 if [ "$jsonrpc" != "2.0" ]; then
 	echo "Content-type: application/json"
@@ -36,7 +38,7 @@ case "$method" in
 			json_add_string "" "status"
 		json_close_array
 	json_close_object
-	exit 0
+	break
 	;;
 
 "system.status")
@@ -51,7 +53,7 @@ case "$method" in
 			json_add_string total "$(free -m | awk '/^Mem/ {print $2}')"
 		json_close_object
 	json_close_object
-	exit 0
+	break
 	;;
 
 "board.post")
@@ -66,7 +68,7 @@ case "$method" in
 			json_add_string total "$(free -m | awk '/^Mem/ {print $2}')"
 		json_close_object
 	json_close_object
-	exit 0
+	break
 	;;
 esac
 json_dump

@@ -2,7 +2,7 @@ cat << dog
 Content-type: text/html
 
 <!DOCTYPE HTML>
-<html lang="en">
+<html lang="en" ng-app="WebUI">
 <head>
 <meta charset="utf-8">
 <title>Emergent Mesh</title>
@@ -29,19 +29,27 @@ Content-type: text/html
 			</button>
 			<ul class="nav">
 				<li$([ "$page" = "default" ] && echo ' class="active"')><a href="/">Home</a></li>
-				<li$([ "$page" = "about" ] && echo ' class="active"')>$(link About about)</li>
-				<li$([ "$page" = "contact" ] && echo ' class="active"')>$(link Contact contact)</li>
-				<li$([ "$page" = "board" ] && echo ' class="active"')>$(link "Message Board" board)</li>
-				<li$([ "$page" = "chat" ] && echo ' class="active"')>$(link Chat chat)</li>
-				<li$([ "$page" = "wiki" ] && echo ' class="active"')>$(link Resources wiki)</li>
 			</ul>
 		<div class="nav-collapse collapse">
 				<ul class="nav">
+					<li$([ "$page" = "about" ] && echo ' class="active"')>$(link About about)</li>
+					<!--li$([ "$page" = "contact" ] && echo ' class="active"')>$(link Contact contact)</li-->
+					<li$([ "$page" = "board" ] && echo ' class="active"')>$(link "Message Board" board)</li>
+					<!--li$([ "$page" = "chat" ] && echo ' class="active"')>$(link Chat chat)</li-->
+					<li$([ "$page" = "wiki" ] && echo ' class="active"')>$(link Resources wiki)</li>
 					<li$([ "$page" = "admin" ] && echo ' class="active"')>$(link Admin admin)</li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Services <b class="caret"></b></a>
+						<ul class="dropdown-menu">
+$(avahi-browse -ltrap | awk '/=;br-lan.*_http._tcp/' | grep -Ev "$(avahi-browse -ltrap | awk -F\; '/=;br-lan.*_mesh/ { printf $8 "|"}')XXX" | while read -r aservice; do
+echo "							<li><a href=\"http://$(echo "$aservice" | awk -F\; '{print $8}')/PATH\">$(echo "$aservice" | awk -F\; '{gsub(/\\032/, " ", $4); print $4}')</a></li>"
+done)
+						</ul>
+					</li>
 				</ul>
 			</div><!--/.nav-collapse -->
 		</div>
 	</div>
 </div>
-<div class="container">
+<div class="container" ng-controller="PageCtrl">
 dog

@@ -1,5 +1,4 @@
 $(nav)
-$(list boards)
 <table class="table table-striped">
 <tr>
 	<th>Board</th>
@@ -14,29 +13,4 @@ $(list boards)
 	<td><a href="/board/topic/1">Lost Kitty</a><br />Joe User - 22 min ago</td>
 </tr>
 </table>
-
-<table class="table table-striped">
-<tr>
-	<th>Post</th>
-	<th width="12.5%" style="text-align: center">Replies</th>
-	<th width="12.5%" style="text-align: center">Views</th>
-	<th width="25%">Last Post</th>
-</tr>
-<tr>
-	<td><a href="/board/topic/1">Lost Kitty</a><br />by Richard User - 30 min ago</td>
-	<td style="text-align: center">1</td>
-	<td style="text-align: center">5</td>
-	<td><a href="/board/topic/1">Lost Kitty</a><br />by Joe User - 22 min ago</td>
-</tr>
-</table>
-
-<div class="well well-small">
-<h3>Lost Kitty</h3>
-by Richard User - 30 min ago
-<p>I have lost a cat. Please let me know if you've found it. Thanks.</p>
-</div>
-<div class="well well-small">
-<h3>re: Lost Kitty</h3>
-by Joe User - 22 min ago
-<p>I have found your cat.</p>
-</div>
+$(echo $boards)

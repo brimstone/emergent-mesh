@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/bin/sh
 
 # global variables
 export HOST="$(uci get system.@system[0].hostname)"

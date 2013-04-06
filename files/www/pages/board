@@ -9,6 +9,10 @@ cat << dog
 </div>
 dog
 }
-list() {
-	echo "Listing things on $1"
-}
+case "$method" in
+"index")
+	boards=1
+	board0="Lost and Found"
+	break
+	;;
+esac
