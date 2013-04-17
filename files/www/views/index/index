@@ -1,10 +1,13 @@
 <!-- Main hero unit for a primary marketing message or call to action -->
 <div class="hero-unit">
+	<div class="container">
 	<h1>Don't Panic</h1>
 	<p>You're on a wireless mesh setup to provide communication with other people in the area.</p>
 	<p>$(link "Learn more &raquo;" "about" "" 'class="btn btn-primary btn-large"')
 	$([ -n "$token" ] && echo "<a href=\"http://$MYIP:2050/nodogsplash_auth/?redir=http%3A%2F%2Fgoogle.com&tok=$token\" class=\"btn btn-primary btn-success btn-large\">Let me online &raquo;</a>")</p>
+	</div>
 </div>
+<div class="container" ng-controller="PageCtrl">
 
 <!-- Example row of columns -->
 <div class="row">
@@ -23,4 +26,6 @@
 		<p>Looking for water or electricity near by?</p>
 		<p>$(link "View details &raquo;" "wiki" "" 'class="btn"')</p>
 	</div>
+</div>
+
 </div>

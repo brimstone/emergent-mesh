@@ -9,6 +9,7 @@ case "$method" in
 	. /usr/share/libubox/jshn.sh
 	json_init
 	json_add_string mode "$(nodeadm mode)"
+	json_add_int time "$(date +%s)"
 	json_add_object flash
 		json_add_int used "$(df /overlay | awk '/^\// { print $4}')"
 		json_add_int total "$(df /overlay | awk '/^\// { print $2}')"
@@ -17,6 +18,30 @@ case "$method" in
 		json_add_int used "$(free -m | awk '/^Mem/ {print $3}')"
 		json_add_int total "$(free -m | awk '/^Mem/ {print $2}')"
 	json_close_object
+	json_add_object arp
+		eval $(awk '/br-lan/ {	print "json_add_object " toupper($4) ";\n";
+						print "json_add_string \"ip\" " $1 ";\n";
+					print "json_close_object;\n";
+		}' /proc/net/arp)
+	json_close_object
+	json_add_object captive
+		eval $(captive-portal list | awk '{	print "json_add_object " toupper($1) ";\n";
+						print "json_add_string \"ip\" " $2 ";\n";
+						print "json_add_int \"time\" " $3 ";\n";
+					print "json_close_object;\n";
+		}')
+	json_close_object
+	json_add_object station
+		eval $(iw dev wlan0 station dump | awk '/Station/ { m=toupper($2) }
+			/signal:/ { s=$2 }
+			/tx bitrate:/ { b=$3 }
+			/TDLS/{	print "json_add_object " m ";\n";
+					print "json_add_string \"signal\" " s ";\n";
+					print "json_add_string \"bitrate\" " b ";\n";
+				print "json_close_object;\n"}')
+	json_close_object
+
+
 	json_dump
 	break
 	;;

@@ -1,3 +1,4 @@
+<div class="container" ng-controller="PageCtrl">
 <h1>Mesh</h1>
 <input type="button" class="btn btn-{{(status.mode == 'Gateway') && 'success' || 'primary'}} meshmode" id="gateway" value="Gateway" />
 <input type="button" class="btn btn-{{(status.mode == 'Standalone') && 'success' || 'primary'}} meshmode" id="standalone" value="Standalone" />
@@ -5,26 +6,41 @@
 
 <h1>Node $HOST</h1>
 <div class="row">
-	<div class="span2"><b>Flash</b></div>
-	<div class="span8">
+	<div class="span1"><b>Flash</b></div>
+	<div class="span2">{{status.flash.total - status.flash.used}}/{{status.flash.total}}KB</b></div>
+	<div class="span7">
 		<div class="progress">
 			<div class="bar" style="width: {{status.flash.used / status.flash.total * 100}}%;"></div>
 		</div>
 	</div>
 </div>
 <div class="row">
-	<div class="span2"><b>Memory</b></div>
-	<div class="span8">
+	<div class="span1"><b>Memory</b></div>
+	<div class="span2">{{status.memory.total - status.memory.used}}/{{status.memory.total}}KB</div>
+	<div class="span7">
 		<div class="progress">
 			<div class="bar" style="width: {{status.memory.used / status.memory.total * 100}}%;"></div>
 		</div>
 	</div>
 </div>
 
-<h1>Captive Portal</h1>
-<pre>
-TODO
-</pre>
+<h1>Clients</h1>
+<table class="table table-bordered table-hover">
+<tr>
+	<th>MAC</th>
+	<th>IP</th>
+	<th>Time Authorized</th>
+	<th>Signal</th>
+	<th>Bitrate</th>
+</tr>
+	<tr ng-repeat="client in status.clients">
+		<td>{{client.mac}}</td>
+		<td>{{client.ip}}</td>
+		<td>{{client.time}}</td>
+		<td>{{client.signal}} dB</td>
+		<td>{{client.bitrate}} mbps</td>
+	</tr>
+</table>
 
 <h1>Other Nodes</h1>
 <table class="table table-bordered table-hover">
@@ -41,10 +57,7 @@ echo "		<td>$(echo "$anode" | awk -F\; '{sub(/"mode=/, "", $10); sub(/"/, "", $1
 echo "	</tr>"
 done)
 </table>
-<h1>Env</h1>
-<pre>
-$(env | sort)
-</pre>
+</div>
 
 <script>
 \$(function() {
@@ -64,8 +77,36 @@ angular.module('WebUI', ['ngResource']);
 function PageCtrl(\$scope, \$resource) {
 	\$scope.admin = \$resource('/admin/:action');
 	\$scope.update = function () {
-		\$scope.status = \$scope.admin.get({action: "status"});
+		var s = \$scope.admin.get({action: "status"}, function() {
+			// start our flattened clients hash, indexed by mac address
+			var clients = {};
+			//loop through arp entries and flip them around
+			for(var mac in s.arp) {
+				if (!clients[mac]) { clients[mac] = {}};
+				clients[mac].ip = s.arp[mac].ip;
+			}
+			for(var mac in s.captive) {
+				if (!clients[mac]) { clients[mac] = {}};
+				clients[mac].ip = s.captive[mac].ip;
+				clients[mac].time = s.captive[mac].time;
+			}
+			for(var mac in s.station) {
+				if (!clients[mac]) { clients[mac] = {}};
+				clients[mac].signal = s.station[mac].signal;
+				clients[mac].bitrate = s.station[mac].bitrate;
+			}
+			s.clients = [];
+			for(var mac in clients) {
+				clients[mac].mac = mac;
+				if (!clients[mac].signal) { clients[mac].signal = 0; }
+				if (!clients[mac].bitrate) { clients[mac].bitrate = 0; }
+				if (!clients[mac].time) { clients[mac].time = 0; }
+				s.clients.push(clients[mac]);
+			}
+		});
+		\$scope.status = s;
 	}
+	\$scope.update();
 	setInterval(\$scope.update, 5000);
 }
 </script>

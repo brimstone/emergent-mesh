@@ -12,6 +12,7 @@ if [ "$REQUEST_METHOD" = "POST" ]; then
 fi
 include "header"
 cat << dog
+<div class="container" ng-controller="PageCtrl">
 <ul class="nav nav-tabs">
 	<li class="active"><a href="#page" data-toggle="tab">Page</a></li>
 	<li><a href="#edit" data-toggle="tab">Edit</a></li>
@@ -49,5 +50,6 @@ cat << dog
 	editor1.run();
 });
 </script>
+</div>
 dog
 include "footer"

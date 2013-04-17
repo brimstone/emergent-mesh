@@ -1,3 +1,4 @@
+<div class="container" ng-controller="PageCtrl">
 $(nav)
 <table class="table table-striped">
 <tr>
@@ -14,3 +15,4 @@ $(nav)
 </tr>
 </table>
 $(echo $boards)
+</div>
