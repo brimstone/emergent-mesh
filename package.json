@@ -1,0 +1,22 @@
+{
+  "name": "emergent-mesh",
+  "version": "0.0.0",
+  "description": "This is an OpenWRT package to convert a minimal attitude adjustment installation to one compliant with [Emergent Mesh](https://256.makerslocal.org/wiki/Emergent_Mesh)",
+  "main": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "",
+  "license": "BSD",
+  "gitHead": "3af3ca1efe3c26fda99d7635a45df52e266e3474",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "bower": "~1.0.0",
+    "grunt": "~0.4.1",
+    "grunt-recess": "~0.3.3",
+    "grunt-contrib-watch": "~0.5.1",
+    "grunt-contrib-jshint": "~0.6.1",
+    "grunt-contrib-less": "~0.6.4"
+  }
+}

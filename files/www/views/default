@@ -4,7 +4,7 @@
 header
 cat << EOF
 	<!-- Main hero unit for a primary marketing message or call to action -->
-	<div class="hero-unit">
+	<div class="jumbotron">
 		<h1>Don't Panic</h1>
 		<p>You're on a wireless mesh setup to provide communication with other people in the area.</p>
 		<p><a href="/about/" class="btn btn-primary btn-large">Learn more &raquo;</a></p>

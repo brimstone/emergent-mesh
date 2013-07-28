@@ -6,20 +6,22 @@
 
 <h1>Node $HOST</h1>
 <div class="row">
-	<div class="span1"><b>Flash</b></div>
-	<div class="span2">{{status.flash.total - status.flash.used}}/{{status.flash.total}}KB</b></div>
-	<div class="span7">
+	<div class="col-lg-1"><b>Flash</b></div>
+	<div class="col-lg-1">{{status.flash.total - status.flash.used}}KB</div>
+	<div class="col-lg-1">{{status.flash.total}}KB</div>
+	<div class="col-lg-9">
 		<div class="progress">
-			<div class="bar" style="width: {{status.flash.used / status.flash.total * 100}}%;"></div>
+			<div class="progress-bar" style="width: {{status.flash.used / status.flash.total * 100}}%;"></div>
 		</div>
 	</div>
 </div>
 <div class="row">
-	<div class="span1"><b>Memory</b></div>
-	<div class="span2">{{status.memory.total - status.memory.used}}/{{status.memory.total}}KB</div>
-	<div class="span7">
+	<div class="col-lg-1"><b>Memory</b></div>
+	<div class="col-lg-1">{{status.memory.total - status.memory.used}}KB</div>
+	<div class="col-lg-1">{{status.memory.total}}KB</div>
+	<div class="col-lg-9">
 		<div class="progress">
-			<div class="bar" style="width: {{status.memory.used / status.memory.total * 100}}%;"></div>
+			<div class="progress-bar" style="width: {{status.memory.used / status.memory.total * 100}}%;"></div>
 		</div>
 	</div>
 </div>
@@ -64,7 +66,7 @@ done)
 	var d = new Date();
 	var s = parseInt(d.getTime() / 1000) - $(date +%s);
 	console.log("Time is " + (s - $(date +%s)) + " seconds off");
-	\$("body > .container").prepend('<div class="alert alert-error"><button type="button" class="close" data-dismiss="alert">&times;</button>Time is ' + s + ' seconds off.<input type="button" class="btn" id="btnTime" value="Fix it!"/></div>');
+	\$("body > .container").prepend('<div class="alert alert-error"><button type="button" class="close" data-dismiss="alert">&times;</button>Time is ' + s + ' seconds off. <input type="button" class="btn btn-small" id="btnTime" value="Fix it!"/></div>');
 	\$("#btnTime").click(function() {
 		var d = new Date();
 		$.getJSON("/admin/time/" + parseInt(d.getTime() / 1000) + "/", function(data) {
@@ -110,3 +112,6 @@ function PageCtrl(\$scope, \$resource) {
 	setInterval(\$scope.update, 5000);
 }
 </script>
+
+<!-- vim: filetype=html
+-->

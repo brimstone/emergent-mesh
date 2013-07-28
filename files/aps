@@ -1,0 +1,66 @@
+#!/bin/ash
+iface=wlan0
+[ -n "$1" ] && iface=$1
+iwlist $iface scan | sed '
+s/^.*ESSID:"\(.*\)"/ESSID \1/g
+s/^.*Signal level=-\(.*\).*/Signal \1/g
+s/^.*Channel:\(.*\).*/Channel \1/g
+s/^.*Mode:/Mode /g
+' | awk '
+function clean_vars() {
+	bssid=""
+	ssid=""
+	signal=""
+	enc=""
+	mode=""
+}
+
+BEGIN {
+	clean_vars()
+}
+
+function print_vars() {
+	if (bssid!="") {
+		print signal " " bssid " " channel " " enc " " mode " " ssid
+	}
+}
+
+/Address:/ {
+	print_vars()
+	bssid=$NF
+}
+
+/^ESSID/ {
+	gsub(/ESSID /,"")
+	ssid=$0
+}
+
+/^Signal/ {
+	signal=$2
+}
+
+/^Channel/ {
+	channel=$2
+}
+
+/Encryption key:off/ {
+	enc="OPN"
+}
+
+/Encryption key:on/ {
+	enc="WEP"
+}
+
+/^Mode/ {
+	mode=$2
+}
+
+/WPA/ {
+	enc="WPA"
+}
+
+END {
+	print_vars()
+}' | sort -n | sed '
+s/^[0-9]* //g
+'

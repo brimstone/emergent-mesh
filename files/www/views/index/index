@@ -1,31 +1,31 @@
 <!-- Main hero unit for a primary marketing message or call to action -->
-<div class="hero-unit">
-	<div class="container">
-	<h1>Don't Panic</h1>
-	<p>You're on a wireless mesh setup to provide communication with other people in the area.</p>
-	<p>$(link "Learn more &raquo;" "about" "" 'class="btn btn-primary btn-large"')
-	$([ -n "$token" ] && echo "<a href=\"http://$MYIP:2050/nodogsplash_auth/?redir=http%3A%2F%2Fgoogle.com&tok=$token\" class=\"btn btn-primary btn-success btn-large\">Let me online &raquo;</a>")</p>
+<div class="container">
+	<div class="jumbotron">
+		<h1>Don't Panic</h1>
+		<p>You're on a wireless mesh setup to provide communication with other people in the area.</p>
+		<p>$(link "Learn more &raquo;" "about" "" 'class="btn btn-primary btn-large"')
+		$([ -n "$token" ] && echo "<a href=\"http://$MYIP:2050/nodogsplash_auth/?redir=http%3A%2F%2Fgoogle.com&tok=$token\" class=\"btn btn-primary btn-success btn-large\">Let me online &raquo;</a>")</p>
 	</div>
-</div>
-<div class="container" ng-controller="PageCtrl">
 
-<!-- Example row of columns -->
-<div class="row">
-	<div class="span4">
-		<h2>Message Board</h2>
-		<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-		<p>$(link "View details &raquo;" "board" "" 'class="btn"')</p>
-	</div>
-	<div class="span4">
-		<h2>Live Webchat</h2>
-		<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-		<p>$(link "View details &raquo;" "chat" "" 'class="btn"')</p>
-	</div>
-	<div class="span4">
-		<h2>Local Resources</h2>
-		<p>Looking for water or electricity near by?</p>
-		<p>$(link "View details &raquo;" "wiki" "" 'class="btn"')</p>
+	<!-- Example row of columns -->
+	<div class="row">
+		<div class="col-lg-4">
+			<h2>Message Board</h2>
+			<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+			<p>$(link "View details &raquo;" "board" "" 'class="btn btn-default"')</p>
+		</div>
+		<div class="col-lg-4">
+			<h2>Live Webchat</h2>
+			<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+			<p>$(link "View details &raquo;" "chat" "" 'class="btn btn-default"')</p>
+		</div>
+		<div class="col-lg-4">
+			<h2>Local Resources</h2>
+			<p>Looking for water or electricity near by?</p>
+			<p>$(link "View details &raquo;" "wiki" "" 'class="btn btn-default"')</p>
+		</div>
 	</div>
 </div>
 
-</div>
+<!-- vim: filetype=html
+-->
