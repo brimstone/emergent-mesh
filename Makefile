@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=emergent-mesh
-PKG_RELEASE:=2013-02-27
+PKG_RELEASE:=2013-07-28
 
 PKG_LICENSE:=GPLv3
 PKG_LICENSE_FILES:=
