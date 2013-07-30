@@ -34,7 +34,7 @@ angular.module("partials/list.html", []).run(["\$templateCache", function(\$temp
 '	<th width="25%">Last Post</th>' +
 '</tr>' +
 '<tr ng-repeat="board in boards">' + /* TODO figure out how to get the board id */
-'	<td><a href="/board/#/board/{{board}}">{{\$index}}{{board.name}}</a><br />{{board.description}}</td>' +
+'	<td><a href="/board/#/board/{{board}}">{{board.name}}</a><br />{{board.description}}</td>' +
 '	<td style="text-align: center">1</td>' +
 '	<td style="text-align: center">2</td>' +
 '	<td><a href="/board/#/topic/">Lost Kitty</a><br />Joe User - 22 min ago</td>' +

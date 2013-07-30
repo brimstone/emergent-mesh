@@ -79,7 +79,7 @@ done)
 
 angular.module('WebUI', ['ngResource']);
 function PageCtrl(\$scope, \$resource) {
-	\$scope.admin = \$resource('/admin/:action');
+	\$scope.admin = \$resource('/:action');
 	\$scope.update = function () {
 		var s = \$scope.admin.get({action: "status"}, function() {
 			// start our flattened clients hash, indexed by mac address
