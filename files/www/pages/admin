@@ -1,4 +1,3 @@
-#!/bin/sh
 if [ "$method" != "index" ]; then
 	echo "Content-type: application/json"
 	echo
@@ -67,3 +66,5 @@ case "$method" in
 		echo '{ "status" : "error" }'
 	fi
 esac
+
+# vim: filetype=sh

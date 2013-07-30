@@ -8,3 +8,5 @@ link() {
 	[ -n "$4" ] && printf " $4"
 	printf ">$1</a>"
 }
+
+# vim: filetype=sh

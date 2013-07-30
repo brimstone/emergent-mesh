@@ -1,3 +1,4 @@
+<div class="container" ng-controller="PageCtrl">
 <table class="table table-striped">
 <tr>
 	<th>Post</th>
@@ -12,3 +13,6 @@
 	<td><a href="/board/topic/1">Lost Kitty</a><br />by Joe User - 22 min ago</td>
 </tr>
 </table>
+</div>
+<!-- vim: filetype=html
+-->

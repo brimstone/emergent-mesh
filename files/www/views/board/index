@@ -1,4 +1,4 @@
-<div class="container" ng-controller="PageCtrl">
+<div class="container" ng-controller="List_Ctrl">
 $(nav)
 <table class="table table-striped">
 <tr>
@@ -7,12 +7,46 @@ $(nav)
 	<th width="12.5%" style="text-align: center">Posts</th>
 	<th width="25%">Last Post</th>
 </tr>
-<tr>
-	<td><a href="/board/list/1">Lost and Found</a><br />A place for lost things to become found.</td>
+<tr ng-repeat="board in boards">
+	<td><a href="/board/#/board/{{board.id}}">{{board.name}}</a><br />{{board.description}}</td>
 	<td style="text-align: center">1</td>
 	<td style="text-align: center">2</td>
-	<td><a href="/board/topic/1">Lost Kitty</a><br />Joe User - 22 min ago</td>
+	<td><a href="/board/#/topic/{{board}}">Lost Kitty</a><br />Joe User - 22 min ago</td>
 </tr>
 </table>
-$(echo $boards)
 </div>
+<script>
+var WebUI = angular.module('WebUI', ['ngResource'])
+.config(['\$routeProvider', function(\$routeProvider) {
+	\$routeProvider
+	.when('/board', {templateUrl: 'partials/main.html', controller: List_Ctrl})
+	.when('/board/:board_id', {templateUrl: 'partials/board.html', controller: Board_Ctrl})
+	.otherwise({redirectTo: '/board'});
+}]);
+
+WebUI.factory("DB_Service", function(\$rootScope, \$resource) {
+	var db = \$resource('/db/:db/:id', {}, {
+		get: {method: 'GET'},
+		get_all: {method: 'GET', params: {id: ''}}
+	});
+
+	return {
+		boards: db.get_all({db: "boards"}),
+		posts: db.get_all({db: "posts"}),
+	}
+});
+
+function List_Ctrl(\$scope, DB_Service) {
+	\$scope.boards = DB_Service.boards;
+	\$scope.posts = DB_Service.posts;
+	console.log(\$scope.boards);
+}
+
+function Board_Ctrl(\$scope, DB_Service) {
+	\$scope.boards = DB_Service.boards;
+	\$scope.posts = DB_Service.posts;
+}
+
+</script>
+<!-- vim: filetype=html
+-->

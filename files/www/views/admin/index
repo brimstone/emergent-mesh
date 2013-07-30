@@ -62,6 +62,7 @@ done)
 </div>
 
 <script>
+/*
 \$(function() {
 	var d = new Date();
 	var s = parseInt(d.getTime() / 1000) - $(date +%s);
@@ -74,6 +75,7 @@ done)
 		});
 	});
 });
+*/
 
 angular.module('WebUI', ['ngResource']);
 function PageCtrl(\$scope, \$resource) {

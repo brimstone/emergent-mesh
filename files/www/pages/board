@@ -16,3 +16,4 @@ case "$method" in
 	break
 	;;
 esac
+# vim: filetype=sh

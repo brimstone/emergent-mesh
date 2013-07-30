@@ -1,4 +1,3 @@
-#!/bin/sh
 if [ "$REQUEST_METHOD" = "POST" ]; then
 	POST_page="$(echo "$POST_page" | sed -e 's/\.\.\///g')"
 	httpd -d "$POST_content" > /wiki/$POST_page
@@ -53,3 +52,4 @@ cat << dog
 </div>
 dog
 include "footer"
+# vim: filetype=sh

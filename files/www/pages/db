@@ -1,0 +1,76 @@
+error() {
+	if [ "$1" = "404" ]; then
+		msg="Not found"
+	else
+		msg="$2"
+	fi
+	echo "Status: $1 $msg"
+	echo "Content-type: application/json"
+	echo
+	. /usr/share/libubox/jshn.sh
+	json_init
+	json_add_string "error" "$msg"
+	json_dump
+}
+
+good() {
+	echo "Content-type: application/json"
+	echo
+}
+
+export DBROOT="/db"
+# create our dbroot if we don't have it
+[ -d "$DBROOT" ] || mkdir -p "$DBROOT"
+
+cd "$DBROOT"
+
+# TODO sanitize these
+doc=$param
+db=$method
+[ "$db" = "index" ] && db=""
+
+# HTTP/1.0 only allows GET HEAD and POST
+case "$REQUEST_METHOD" in
+"GET")
+	# if we're just getting / return a list of databases
+	if [ -z "$db" ]; then
+		. /usr/share/libubox/jshn.sh
+		json_init
+		json_add_array "databases"
+		for d in *; do
+			[ ! -d "$d" ] && continue
+			json_add_object
+				json_add_string "name" "$d"
+			json_close_object
+		done
+		json_dump
+		return
+	elif [ -z "$doc" ]; then
+		cd "$db"
+		echo "{"
+		flag=0
+		for d in *; do
+			[ ! -e "$d" ] && continue
+			[ "$flag" = 1 ] && echo ","
+			flag=1
+			echo "\"$d\":"
+			cat "$d"
+		done
+		echo "}"
+		cd ..
+		return
+	fi
+	[ ! -e "$db/$doc" ] && error 404 && return
+	good
+	cat "$db/$doc"
+	break
+	;;
+"POST")
+	[ ! -d "$db" ] && mkdir "$db"
+	echo "$POSTRAW" > "$db/$doc"
+	good
+	break
+	;;
+esac
+
+# vim: filetype=sh

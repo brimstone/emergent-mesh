@@ -1,1 +1,2 @@
 export token=$(ndsctl status | awk "/$REMOTE_ADDR/,/Token/" | awk '/Token/ {print $2}')
+# vim: filetype=sh

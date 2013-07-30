@@ -11,3 +11,4 @@ else
 	echo "Status: 302 Temporary Redirect"
 	echo "Location: /"
 fi
+# vim: filetype=sh

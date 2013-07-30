@@ -72,3 +72,5 @@ case "$method" in
 	;;
 esac
 json_dump
+
+# vim: filetype=sh
