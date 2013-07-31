@@ -1,19 +1,1 @@
-nav() {
-cat << dog
-<div class="navbar">
-	<div class="navbar-inner">
-		<ul class="nav">
-			<li><a href="#"><i class="icon-file"></i> New</a></li>
-		</ul>
-	</div>
-</div>
-dog
-}
-case "$method" in
-"index")
-	boards=1
-	board0="Lost and Found"
-	break
-	;;
-esac
 # vim: filetype=sh
