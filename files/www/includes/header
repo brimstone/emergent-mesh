@@ -1,6 +1,5 @@
+echo "Content-type: text/html" >&2
 cat << dog
-Content-type: text/html
-
 <!DOCTYPE HTML>
 <html lang="en" ng-app="WebUI">
 <head>

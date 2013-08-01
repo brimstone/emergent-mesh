@@ -1,6 +1,5 @@
 if [ "$method" != "index" ]; then
-	echo "Content-type: application/json"
-	echo
+	echo "Content-type: application/json" >&2
 fi
 
 case "$method" in

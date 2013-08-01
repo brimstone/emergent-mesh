@@ -4,9 +4,8 @@ error() {
 	else
 		msg="$2"
 	fi
-	echo "Status: $1 $msg"
-	echo "Content-type: application/json"
-	echo
+	echo "Status: $1 $msg" >&2
+	echo "Content-type: application/json" >&2
 	. /usr/share/libubox/jshn.sh
 	json_init
 	json_add_string "error" "$msg"
@@ -14,8 +13,7 @@ error() {
 }
 
 good() {
-	echo "Content-type: application/json"
-	echo
+	echo "Content-type: application/json" >&2
 }
 
 export DBROOT="/db"

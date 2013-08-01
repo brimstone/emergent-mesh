@@ -1,11 +1,11 @@
 if [ "$REQUEST_METHOD" = "POST" ]; then
 	POST_page="$(echo "$POST_page" | sed -e 's/\.\.\///g')"
 	httpd -d "$POST_content" > /wiki/$POST_page
-	echo "Status: 302 Temporary Redirect"
+	echo "Status: 302 Temporary Redirect" >&2
 	if [ "$POST_page" = "index" ]; then
-		echo "Location: /wiki"
+		echo "Location: /wiki" >&2
 	else
-		echo "Location: /wiki/$POST_page"
+		echo "Location: /wiki/$POST_page" >&2
 	fi
 	exit
 fi

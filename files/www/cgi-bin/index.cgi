@@ -38,19 +38,26 @@ if [ -f "$WWWROOT/pages/$page" -o -f "$WWWROOT/views/$page/$method" ]; then
 		fi
 	fi
 	# build up a tiny driver script
-	(
-	# source our common functions
-	echo "source \"$WWWROOT/includes/functions\""
-	# if we have a page, execute it
-	[ -e "$WWWROOT/pages/$page" ] && echo "source \"$WWWROOT/pages/$page\""
-	# if we have a page/method, execute that with a wrapper
-	if [ -e "$WWWROOT/views/$page/$method" ]; then
-		echo "source \"$WWWROOT/includes/header\""
-		echo "cat << dog"
-		cat "$WWWROOT/views/$page/$method"
-		echo "dog"
-		echo "source \"$WWWROOT/includes/footer\""
-	fi) | ash
+	( # This shell handles merging the header (stderr) before stdout
+		( # This shell handles compressing stdout
+			( # This shell handles running our cgi driver
+				# source our common functions
+				echo "source \"$WWWROOT/includes/functions\""
+				# if we have a page, execute it
+				[ -e "$WWWROOT/pages/$page" ] && echo "source \"$WWWROOT/pages/$page\""
+				# if we have a page/method, execute that with a wrapper
+				if [ -e "$WWWROOT/views/$page/$method" ]; then
+					echo "source \"$WWWROOT/includes/header\""
+					echo "cat << dog"
+					cat "$WWWROOT/views/$page/$method"
+					echo "dog"
+					echo "source \"$WWWROOT/includes/footer\""
+				fi
+			) | ash
+			echo "Content-Encoding: gzip" >&2
+			echo >&2
+		) | gzip -9
+	) 2>&1
 else
 	# else redirect them to the root page and method
 	echo "Status: 302 Temporary Redirect"

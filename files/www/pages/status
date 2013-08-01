@@ -1,5 +1,4 @@
-echo "Content-type: application/json"
-echo
+echo "Content-type: application/json" >&2
 
 . /usr/share/libubox/jshn.sh
 json_init
