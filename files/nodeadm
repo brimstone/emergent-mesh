@@ -194,15 +194,15 @@ search() {
 getmode() {
 	if senselink && isserver; then
 		echo "Gateway"
-		exit
+		return
 	fi
 	if isserver; then
 		echo "Standalone"
-		exit
+		return
 	fi
 	if isclient; then
 		echo "Client"
-		exit
+		return
 	fi
 	echo "Unknown"
 }
@@ -222,6 +222,55 @@ writeservice() {
 dog
 /etc/init.d/avahi-daemon restart
 }
+
+writestatus() {
+	DBROOT="/db"
+	[ ! -d "$DBROOT" ] && mkdir "$DBROOT"
+	[ ! -e "$DBROOT/status/$HOST.json"] && rm -rf "$DBROOT/status" 2>/dev/null
+	[ ! -d "$DBROOT/status" ] && mkdir "$DBROOT/status"
+
+	. /usr/share/libubox/jshn.sh
+	json_init
+	json_add_string mode "$(getmode)"
+	json_add_int time "$(date +%s)"
+	json_add_object flash
+		json_add_int used "$(df /overlay | awk '/^\// { print $4}')"
+		json_add_int total "$(df /overlay | awk '/^\// { print $2}')"
+	json_close_object
+	json_add_object memory
+		json_add_int used "$(free -m | awk '/^Mem/ {print $3}')"
+		json_add_int total "$(free -m | awk '/^Mem/ {print $2}')"
+	json_close_object
+	json_add_object arp
+		eval $(awk '/br-lan/ {	print "json_add_object " toupper($4) ";\n";
+						print "json_add_string \"ip\" " $1 ";\n";
+					print "json_close_object;\n";
+		}' /proc/net/arp)
+	json_close_object
+	json_add_object captive
+		eval $(captive-portal list | awk '{	print "json_add_object " toupper($1) ";\n";
+						print "json_add_string \"ip\" " $2 ";\n";
+						print "json_add_int \"time\" " $3 ";\n";
+					print "json_close_object;\n";
+		}')
+	json_close_object
+	json_add_object station
+		eval $(iw dev wlan0 station dump | awk '/Station/ { m=toupper($2) }
+			/signal:/ { s=$2 }
+			/tx bitrate:/ { b=$3 }
+			/TDLS/{	print "json_add_object " m ";\n";
+					print "json_add_string \"signal\" " s ";\n";
+					print "json_add_string \"bitrate\" " b ";\n";
+				print "json_close_object;\n"}')
+	json_close_object
+	json_add_object software
+		json_add_string version "$(opkg info emergent-mesh | awk '/Version:/ {print $2}')"
+	json_close_object
+	json_dump > "$DBROOT/status/$HOST.json"
+
+# vim: filetype=sh
+}
+
 case "$1" in
 'check')
 if [ -z "$(uci get wireless.@wifi-iface[0].bssid 2>/dev/null)" ]; then
@@ -250,6 +299,7 @@ if ! isrouting; then
 fi
 
 HOST="$(uci get system.@system[0].hostname)"
+writestatus
 # if we have a link
 if senselink; then
 	logit "has a link"
@@ -313,3 +363,5 @@ esac
 
 echo "Usage: $0 <check|gateway|standalone|client|mode|config>"
 exit 1
+
+# vim: filetype=sh
