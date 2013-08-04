@@ -5,24 +5,20 @@
 <input type="button" class="btn btn-{{(status.mode == 'Client') && 'success' || 'primary'}} meshmode" id="client" value="Client" />
 
 <h1>Node $HOST</h1>
-<div class="row">
-	<div class="col-lg-1"><b>Flash</b></div>
-	<div class="col-lg-1">{{status.flash.total - status.flash.used}}KB</div>
-	<div class="col-lg-1">{{status.flash.total}}KB</div>
-	<div class="col-lg-9">
-		<div class="progress">
-			<div class="progress-bar" style="width: {{status.flash.used / status.flash.total * 100}}%;"></div>
-		</div>
+
+<div class="row" ng-repeat="node in nodekeys">
+	<div class="col-sm-3" style="border: 1px solid black">
+		<h2>{{node}}</h2>
+		{{nodes[node].mode}}
 	</div>
-</div>
-<div class="row">
-	<div class="col-lg-1"><b>Memory</b></div>
-	<div class="col-lg-1">{{status.memory.total - status.memory.used}}KB</div>
-	<div class="col-lg-1">{{status.memory.total}}KB</div>
-	<div class="col-lg-9">
-		<div class="progress">
-			<div class="progress-bar" style="width: {{status.memory.used / status.memory.total * 100}}%;"></div>
-		</div>
+	<div class="col-sm-3" style="border: 1px solid black">
+		<h2>Load</h2>
+	</div>
+	<div class="col-sm-3" style="border: 1px solid black">
+		<h2>Memory</h2>
+	</div>
+	<div class="col-sm-3" style="border: 1px solid black">
+		<h2>Flash</h2>
 	</div>
 </div>
 
@@ -80,35 +76,49 @@ done)
 angular.module('WebUI', ['ngResource']);
 function PageCtrl(\$scope, \$resource) {
 	\$scope.admin = \$resource('/:action');
+	\$scope.db = \$resource('/db/:action');
 	\$scope.update = function () {
-		var s = \$scope.admin.get({action: "status"}, function() {
-			// start our flattened clients hash, indexed by mac address
-			var clients = {};
-			//loop through arp entries and flip them around
-			for(var mac in s.arp) {
-				if (!clients[mac]) { clients[mac] = {}};
-				clients[mac].ip = s.arp[mac].ip;
+		var s = \$scope.db.get({action: "status"}, function() {
+			\$scope.nodes = {};
+			\$scope.nodekeys = [];
+			for (var key in s) {
+				if (key.substr(0,1) == '\$') {
+					continue;
+				}
+				\$scope.nodekeys.push(key);
+				\$scope.nodes[key] = {
+					mode: s[key].mode,
+					time: s[key].time,
+					flash: s[key].flash,
+					software: s[key].software
+				}
+				// start our flattened clients hash, indexed by mac address
+				var clients = {};
+				//loop through arp entries and flip them around
+				for(var mac in s[key].arp) {
+					if (!clients[mac]) { clients[mac] = {}};
+					clients[mac].ip = s[key].arp[mac].ip;
+				}
+				for(var mac in s[key].captive) {
+					if (!clients[mac]) { clients[mac] = {}};
+					clients[mac].ip = s[key].captive[mac].ip;
+					clients[mac].time = s[key].captive[mac].time;
+				}
+				for(var mac in s[key].station) {
+					if (!clients[mac]) { clients[mac] = {}};
+					clients[mac].signal = s[key].station[mac].signal;
+					clients[mac].bitrate = s[key].station[mac].bitrate;
+				}
+				for(var mac in clients) {
+					clients[mac].mac = mac;
+					if (!clients[mac].signal) { clients[mac].signal = 0; }
+					if (!clients[mac].bitrate) { clients[mac].bitrate = 0; }
+					if (!clients[mac].time) { clients[mac].time = 0; }
+				}
+				\$scope.nodes[key].clients=clients;
 			}
-			for(var mac in s.captive) {
-				if (!clients[mac]) { clients[mac] = {}};
-				clients[mac].ip = s.captive[mac].ip;
-				clients[mac].time = s.captive[mac].time;
-			}
-			for(var mac in s.station) {
-				if (!clients[mac]) { clients[mac] = {}};
-				clients[mac].signal = s.station[mac].signal;
-				clients[mac].bitrate = s.station[mac].bitrate;
-			}
-			s.clients = [];
-			for(var mac in clients) {
-				clients[mac].mac = mac;
-				if (!clients[mac].signal) { clients[mac].signal = 0; }
-				if (!clients[mac].bitrate) { clients[mac].bitrate = 0; }
-				if (!clients[mac].time) { clients[mac].time = 0; }
-				s.clients.push(clients[mac]);
-			}
+			console.log(\$scope.nodes);
 		});
-		\$scope.status = s;
 	}
 	\$scope.update();
 	setInterval(\$scope.update, 5000);
