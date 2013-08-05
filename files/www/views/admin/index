@@ -4,58 +4,51 @@
 <input type="button" class="btn btn-{{(status.mode == 'Standalone') && 'success' || 'primary'}} meshmode" id="standalone" value="Standalone" />
 <input type="button" class="btn btn-{{(status.mode == 'Client') && 'success' || 'primary'}} meshmode" id="client" value="Client" />
 
-<h1>Node $HOST</h1>
-
-<div class="row" ng-repeat="node in nodekeys">
-	<div class="col-sm-3" style="border: 1px solid black">
-		<h2>{{node}}</h2>
-		{{nodes[node].mode}}
+<div ng-repeat="node in nodekeys">
+	<div class="row">
+		<div class="col-sm-3">
+			<h2>{{node}}</h2>
+			{{nodes[node].mode}}
+			<!-- TODO Move buttons down here-->
+		</div>
+		<div class="col-sm-3">
+			<h2>Load</h2>
+			<!-- TODO add this to nodeadm -->
+		</div>
+		<div class="col-sm-3">
+			<h2>Memory</h2>
+			<!-- TODO Find a good gauge -->
+			{{nodes[node].memory.used}}
+			{{nodes[node].memory.total}}
+		</div>
+		<div class="col-sm-3">
+			<h2>Flash</h2>
+			<!-- TODO Find a good gauge -->
+			{{nodes[node].flash.used}}
+			{{nodes[node].flash.total}}
+		</div>
 	</div>
-	<div class="col-sm-3" style="border: 1px solid black">
-		<h2>Load</h2>
-	</div>
-	<div class="col-sm-3" style="border: 1px solid black">
-		<h2>Memory</h2>
-	</div>
-	<div class="col-sm-3" style="border: 1px solid black">
-		<h2>Flash</h2>
+	<div class="row">
+		<div class="col-sm-12">
+			<table class="table table-bordered table-hover">
+			<tr>
+				<th>MAC</th>
+				<th>IP</th>
+				<th>Time Authorized</th>
+				<th>Signal</th>
+				<th>Bitrate</th>
+			</tr>
+				<tr ng-repeat="client in nodes[node].clients">
+					<td>{{client.mac}}</td>
+					<td>{{client.ip}}</td>
+					<td>{{client.time}}</td>
+					<td>{{client.signal}} dB</td>
+					<td>{{client.bitrate}} mbps</td>
+				</tr>
+			</table>
 	</div>
 </div>
 
-<h1>Clients</h1>
-<table class="table table-bordered table-hover">
-<tr>
-	<th>MAC</th>
-	<th>IP</th>
-	<th>Time Authorized</th>
-	<th>Signal</th>
-	<th>Bitrate</th>
-</tr>
-	<tr ng-repeat="client in status.clients">
-		<td>{{client.mac}}</td>
-		<td>{{client.ip}}</td>
-		<td>{{client.time}}</td>
-		<td>{{client.signal}} dB</td>
-		<td>{{client.bitrate}} mbps</td>
-	</tr>
-</table>
-
-<h1>Other Nodes</h1>
-<table class="table table-bordered table-hover">
-<tr>
-	<th>Hostname</th>
-	<th>IP</th>
-	<th>Mode</th>
-</tr>
-$(avahi-browse -ltrap | awk '/=;br-lan.*_mesh/' | while read anode; do
-echo "	<tr>"
-echo "		<td>$(echo "$anode" | awk -F\; '{print $7}')</td>"
-echo "		<td>$(echo "$anode" | awk -F\; '{print $8}')</td>"
-echo "		<td>$(echo "$anode" | awk -F\; '{sub(/"mode=/, "", $10); sub(/"/, "", $10); print $10}')</td>"
-echo "	</tr>"
-done)
-</table>
-</div>
 
 <script>
 /*
@@ -86,12 +79,7 @@ function PageCtrl(\$scope, \$resource) {
 					continue;
 				}
 				\$scope.nodekeys.push(key);
-				\$scope.nodes[key] = {
-					mode: s[key].mode,
-					time: s[key].time,
-					flash: s[key].flash,
-					software: s[key].software
-				}
+				\$scope.nodes[key] = s[key];
 				// start our flattened clients hash, indexed by mac address
 				var clients = {};
 				//loop through arp entries and flip them around
@@ -116,6 +104,9 @@ function PageCtrl(\$scope, \$resource) {
 					if (!clients[mac].time) { clients[mac].time = 0; }
 				}
 				\$scope.nodes[key].clients=clients;
+				delete \$scope.nodes[key].arp;
+				delete \$scope.nodes[key].captive;
+				delete \$scope.nodes[key].station;
 			}
 			console.log(\$scope.nodes);
 		});
