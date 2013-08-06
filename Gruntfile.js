@@ -10,7 +10,7 @@
 'use strict';
 
 module.exports = function(grunt) {
-
+	var exec = require('child_process').exec;
 	// Project configuration.
 	grunt.initConfig({
 		recess: {
@@ -26,7 +26,7 @@ module.exports = function(grunt) {
 		},
 		jshint: {
 			gruntfile: ['Gruntfile.js'],
-			libs_n_tests: ['js/*.js'],
+			libs_n_tests: ['js/controller/*.js', 'js/app/*.js'],
 			options: {
 				curly: true,
 				eqeqeq: true,
@@ -40,8 +40,38 @@ module.exports = function(grunt) {
 				boss: true,
 				eqnull: true,
 				node: true,
+			}
+		},
+		concat: {
+			dist: {
+				files: {
+					'files/www/js/all.js': [
+						'js/vendor/*.js',
+						'js/controller/*.js',
+						'js/app/*.js'
+					]
 				}
+			}
+		},
+		uglify: {
+			options: {
+				compress: true,
+				report: 'min'
 			},
+			dist: {
+				files: {
+					'files/www/js/all.js': [ 'files/www/js/all.js' ]
+				}
+			}
+		},
+		shell: {
+			css: {
+				command: "rm files/www/css/all.css.gz; gzip -9 files/www/css/all.css; scp files/www/css/all/css.gz root@172.16.0.2:/www/css/"
+			},
+			js: {
+				command: "rm files/www/js/all.js.gz; gzip -9 files/www/js/all.js.gz; scp files/www/js/all.js.gz root@172.16.0.2:/www/js/"
+			}
+		},
 		watch: {
 			gruntfile: {
 				files: ['<%= jshint.gruntfile %>'],
@@ -49,12 +79,21 @@ module.exports = function(grunt) {
 			},
 			libs_n_tests: {
 				files: ['<%= jshint.libs_n_tests %>'],
-				tasks: ['jshint:libs_n_tests']
+				tasks: ['jshint:libs_n_tests', 'concat', 'uglify', 'shell:js'],
+				options: {
+					livereload: true
+				}
 			},
 			recess: {
 				files: ['less/*.less'],
-				tasks: ['recess'],
+				tasks: ['recess', 'shell:css'],
+				options: {
+					livereload: true
+				}
 			},
+			www: {
+				files: ['files/www/**'],
+			}
 		},
 	});
 
@@ -62,12 +101,36 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-less');
+	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-shell');
 	grunt.loadNpmTasks('grunt-recess');
 
 	// "npm test" runs these tasks
 	grunt.registerTask('test', ['jshint']);
 
 	// Default task.
-	grunt.registerTask('default', ['test', 'recess']);
+	grunt.registerTask('default', ['test', 'recess', 'concat', 'uglify', 'shell:js']);
 
+	// Special Watch tasks
+	grunt.event.on('watch', function(action, filepath, target) {
+		if (target != "www") {
+			return;
+		}
+		var matches = /files\/www\/[^cj][^s]/.exec(filepath);
+		if (matches != null && action == "changed" ) {
+			grunt.log.writeln("Regex match with " + filepath + ": " + action);
+			var cp = exec("scp " + filepath + " root@172.16.0.2:" + filepath.substr(5), {}, function (err, stdout, stderr) {
+				grunt.log.writeln("Scp of " + filepath + " finished");
+				if (err) {
+					grunt.warn(err);
+				}
+				else {
+					// trigger livereload
+					exec("curl -s -X POST http://localhost:35729/changed -d '{ \"files\": [\"" + filepath + "\"] }'", {}, console.log);
+				}
+			});
+		}
+	});
 };
