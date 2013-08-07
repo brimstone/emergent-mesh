@@ -1,3 +1,5 @@
 node_modules
-
 bower_components
+notfiles
+files/www/css/all.css.gz
+files/www/js/all.js.gz
