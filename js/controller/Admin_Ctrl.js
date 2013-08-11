@@ -1,9 +1,11 @@
 window.app.controller('Admin_Ctrl', ['$scope', '$resource', function ($scope, $resource) {
 	"use strict";
 	$scope.db = $resource('/db/:action');
+	$scope.pickles = 0;
 	$scope.update = function () {
+		$scope.pickles = Math.floor(Math.random()*100);
+		console.log($scope.pickles);
 		var s = $scope.db.get({action: "status"}, function() {
-			console.log("Got this far", s);
 			$scope.nodes = {};
 			$scope.nodekeys = [];
 			for (var key in s) {
@@ -41,7 +43,6 @@ window.app.controller('Admin_Ctrl', ['$scope', '$resource', function ($scope, $r
 				delete $scope.nodes[key].captive;
 				delete $scope.nodes[key].station;
 			}
-			console.log($scope.nodes);
 		});
 	};
 	$scope.update();

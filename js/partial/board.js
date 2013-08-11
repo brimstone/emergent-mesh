@@ -3,7 +3,7 @@ angular.module("partials/board.html", []).run(["$templateCache", function($templ
 	"use strict";
 	$templateCache.put("partials/board.html",
 '<ul class="breadcrumb">' +
-'  <li><a href="/board/#/boards">Boards</a></li>' +
+'  <li><a href="/board/#/board">Boards</a></li>' +
 '  <li class="active" ng-bind="boards[board_id].name">Board</li>' +
 '</ul>' +
 '<div class="container">' +

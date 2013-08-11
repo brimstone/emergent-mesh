@@ -30,7 +30,8 @@ module.exports = function(grunt) {
 				'js/app.js',
 				'js/partial/*.js',
 				'js/service/*.js',
-				'js/controller/*.js'
+				'js/controller/*.js',
+				'js/directives/*.js'
 				],
 			options: {
 				curly: true,
@@ -58,7 +59,8 @@ module.exports = function(grunt) {
 						'js/partial/*.js',
 						'js/app.js',
 						'js/service/*.js',
-						'js/controller/*.js'
+						'js/controller/*.js',
+						'js/directives/*.js'
 					]
 				}
 			}
@@ -75,8 +77,11 @@ module.exports = function(grunt) {
 			}
 		},
 		shell: {
+			gzipcss: {
+				command: "rm files/www/css/all.css.gz; gzip -9 files/www/css/all.css; ssh root@172.16.0.2 rm /www/css/all.css; scp files/www/css/all.css.gz root@172.16.0.2:/www/css/"
+			},
 			css: {
-				command: "rm files/www/css/all.css.gz; gzip -9 files/www/css/all.css; scp files/www/css/all/css.gz root@172.16.0.2:/www/css/"
+				command: "ssh root@172.16.0.2 rm /www/css/all.css; scp files/www/css/all.css root@172.16.0.2:/www/css/"
 			},
 			gzipjs: {
 				command: "rm files/www/js/all.js.gz; gzip -9 files/www/js/all.js; ssh root@172.16.0.2 rm /www/js/all.js; scp files/www/js/all.js.gz root@172.16.0.2:/www/js/"
@@ -100,7 +105,7 @@ module.exports = function(grunt) {
 			},
 			recess: {
 				files: ['less/*.less'],
-				tasks: ['recess', 'shell:css'],
+				tasks: ['recess', 'shell:gzipcss'],
 				options: {
 					livereload: true
 				}
@@ -121,8 +126,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-shell');
 	grunt.loadNpmTasks('grunt-recess');
 
-	grunt.registerTask('css', ['recess', 'shell:css']);
-	grunt.registerTask('js', ['jshint', 'concat', 'uglify', 'shell:js']);
+	grunt.registerTask('css', ['recess', 'shell:gzipcss']);
+	grunt.registerTask('js', ['jshint', 'concat', 'uglify', 'shell:gzipjs']);
 	// Default task.
 	grunt.registerTask('default', ['css', 'js']);
 

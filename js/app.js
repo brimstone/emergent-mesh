@@ -1,5 +1,5 @@
 /*global angular:true, List_Ctrl:true, Board_Ctrl:true */
-window.app = angular.module('WebUI', ['ngResource', 'partials/list.html', 'partials/board.html', 'partials/post.html'])
+window.app = angular.module('WebUI', ['ui.bootstrap', 'ngResource', 'graphing.directives', 'partials/list.html', 'partials/board.html', 'partials/post.html'])
 .config(['$routeProvider', function($routeProvider) {
 	"use strict";
 	$routeProvider

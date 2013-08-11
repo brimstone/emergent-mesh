@@ -12,6 +12,11 @@ nogateways() {
 	batctl gwl | grep -q "No gateways in range"
 }
 
+gateways() {
+	# this should return a list of the IPs of other gateways on the mesh
+	avahi-browse -ltrap | awk -F\; '/=;br-lan.*_mesh._tcp.*mode=(standalone|gateway)/ {print $8}'
+}
+
 isrunning() {
 	pidof "$1" >/dev/null
 }
@@ -45,6 +50,14 @@ gatewaymode() {
 	fi
 	isrunning dnsmasq || /etc/init.d/dnsmasq start
 	writeservice gateway
+	(
+		echo "delete system.ntp.server"
+		for g in 0 1 2 3; do
+			echo "add_list system.ntp.server='$g.openwrt.pool.ntp.org'"
+		done
+		echo "commit"
+	) | uci batch
+	/etc/init.d/sysntpd restart
 }
 
 standalonemode() {
@@ -59,6 +72,11 @@ standalonemode() {
 	ifconfig eth0 192.168.0.2
 	route add default gw 192.168.0.1
 	writeservice standalone
+	(
+		echo "delete system.ntp.server"
+		echo "commit"
+	) | uci batch
+	/etc/init.d/sysntpd restart
 }
 
 clientmode() {
@@ -67,6 +85,14 @@ clientmode() {
 	/etc/init.d/dnsmasq stop
 	logit "now a client"
 	writeservice client
+	(
+		echo "delete system.ntp.server"
+		for g in $(gateways); do
+			echo "add_list system.ntp.server='$g'"
+		done
+		echo "commit"
+	) | uci batch
+	/etc/init.d/sysntpd restart
 }
 
 config() {

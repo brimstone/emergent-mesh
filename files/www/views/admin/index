@@ -1,4 +1,4 @@
-<div class="container" ng-controller="AdminCtrl">
+<div class="container" ng-controller="Admin_Ctrl">
 <h1>Mesh</h1>
 <input type="button" class="btn btn-{{(status.mode == 'Gateway') && 'success' || 'primary'}} meshmode" id="gateway" value="Gateway" />
 <input type="button" class="btn btn-{{(status.mode == 'Standalone') && 'success' || 'primary'}} meshmode" id="standalone" value="Standalone" />
@@ -7,13 +7,14 @@
 <div ng-repeat="node in nodekeys">
 	<div class="row">
 		<div class="col-sm-3">
-			<h2>{{node}}</h2>
+			<h2>{{node.replace(".json", "")}}</h2>
 			{{nodes[node].mode}}
 			<!-- TODO Move buttons down here-->
 		</div>
 		<div class="col-sm-3">
 			<h2>Load</h2>
 			<!-- TODO add this to nodeadm -->
+			<span class="load"><gauge percent="pickles" /></span>
 		</div>
 		<div class="col-sm-3">
 			<h2>Memory</h2>
