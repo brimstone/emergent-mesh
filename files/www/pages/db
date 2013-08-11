@@ -44,11 +44,17 @@ case "$REQUEST_METHOD" in
 		json_dump
 		return
 	elif [ -z "$doc" ]; then
+		if [ ! -d "$db" ]; then
+			good
+			echo "{ }" # TODO make this an error object and handle it in code
+			return
+		fi
 		cd "$db"
+		good
 		echo "{"
 		flag=0
 		for d in *; do
-			[ ! -e "$d" ] && continue
+			[ ! -f "$d" ] && continue
 			[ "$flag" = 1 ] && echo ","
 			flag=1
 			echo "\"$d\":"

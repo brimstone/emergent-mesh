@@ -26,7 +26,12 @@ module.exports = function(grunt) {
 		},
 		jshint: {
 			gruntfile: ['Gruntfile.js'],
-			libs_n_tests: ['js/controller/*.js', 'js/app.js'],
+			libs_n_tests: [
+				'js/app.js',
+				'js/partial/*.js',
+				'js/service/*.js',
+				'js/controller/*.js'
+				],
 			options: {
 				curly: true,
 				eqeqeq: true,
@@ -38,7 +43,7 @@ module.exports = function(grunt) {
 				undef: true,
 				boss: true,
 				eqnull: true,
-				unused: true,
+				//unused: true,
 				browser: true,
 				strict: true,
 				jquery: true,
@@ -50,7 +55,9 @@ module.exports = function(grunt) {
 				files: {
 					'files/www/js/all.js': [
 						'js/vendor/*.js',
+						'js/partial/*.js',
 						'js/app.js',
+						'js/service/*.js',
 						'js/controller/*.js'
 					]
 				}
@@ -71,8 +78,11 @@ module.exports = function(grunt) {
 			css: {
 				command: "rm files/www/css/all.css.gz; gzip -9 files/www/css/all.css; scp files/www/css/all/css.gz root@172.16.0.2:/www/css/"
 			},
+			gzipjs: {
+				command: "rm files/www/js/all.js.gz; gzip -9 files/www/js/all.js; ssh root@172.16.0.2 rm /www/js/all.js; scp files/www/js/all.js.gz root@172.16.0.2:/www/js/"
+			},
 			js: {
-				command: "rm files/www/js/all.js.gz; gzip -9 files/www/js/all.js; scp files/www/js/all.js.gz root@172.16.0.2:/www/js/"
+				command: "ssh root@172.16.0.2 rm /www/js/all.js.gz; scp files/www/js/all.js root@172.16.0.2:/www/js/"
 			}
 		},
 		watch: {
@@ -82,7 +92,8 @@ module.exports = function(grunt) {
 			},
 			libs_n_tests: {
 				files: ['<%= jshint.libs_n_tests %>'],
-				tasks: ['jshint:libs_n_tests', 'concat', 'uglify', 'shell:js'],
+				//tasks: ['jshint:libs_n_tests', 'concat', 'uglify', 'shell:gzipjs'],
+				tasks: ['jshint:libs_n_tests', 'concat', 'shell:js'],
 				options: {
 					livereload: true
 				}
@@ -110,8 +121,10 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-shell');
 	grunt.loadNpmTasks('grunt-recess');
 
+	grunt.registerTask('css', ['recess', 'shell:css']);
+	grunt.registerTask('js', ['jshint', 'concat', 'uglify', 'shell:js']);
 	// Default task.
-	grunt.registerTask('default', ['jshint', 'recess', 'concat', 'uglify', 'shell:js']);
+	grunt.registerTask('default', ['css', 'js']);
 
 	// Special Watch tasks
 	grunt.event.on('watch', function(action, filepath, target) {
