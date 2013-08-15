@@ -1,10 +1,9 @@
-window.app.controller('Admin_Ctrl', ['$scope', '$resource', function ($scope, $resource) {
+window.app.controller('Admin_Ctrl', ['$scope', '$resource', '$timeout', function ($scope, $resource, $timeout) {
 	"use strict";
 	$scope.db = $resource('/db/:action');
 	$scope.pickles = 0;
 	$scope.update = function () {
 		$scope.pickles = Math.floor(Math.random()*100);
-		console.log($scope.pickles);
 		var s = $scope.db.get({action: "status"}, function() {
 			$scope.nodes = {};
 			$scope.nodekeys = [];
@@ -44,7 +43,7 @@ window.app.controller('Admin_Ctrl', ['$scope', '$resource', function ($scope, $r
 				delete $scope.nodes[key].station;
 			}
 		});
+		$timeout($scope.update, 5000);
 	};
 	$scope.update();
-	setInterval($scope.update, 5000);
 }]);

@@ -43,6 +43,11 @@ case "$REQUEST_METHOD" in
 		done
 		json_dump
 		return
+	elif [ "$db" = "all.tar.gz" ]; then
+		echo "Content-type: application/gzip" >&2
+		echo "Content-Disposition: attachment; filename=\"all.tar\"" >&2
+		tar -cC /db .
+		return
 	elif [ -z "$doc" ]; then
 		if [ ! -d "$db" ]; then
 			good

@@ -1,0 +1,32 @@
+#!/bin/ash
+# DB replication funness
+
+# lock with traps?
+
+mkdir /tmp/db-$$
+cd /tmp/db-$$
+wget http://$1/db/all.tar.gz/ -O - | tar -zxf -
+for d in *; do
+	mkdir "/db/$d"
+done
+find . -type f | while read "afile"; do
+	echo "checking $afile"
+	[ ! -s "/db/$afile" -o "$afile" -nt "/db/$afile" ] && echo "$afile is newer than /db/$afile" && cp "$afile" /db/$afile
+done
+
+# check for deleted files
+cd /db
+# check our files in each .delete
+for d in *; do
+	cd "$d"
+	# check the hash of every file in .delete
+	# if the hash is the same, nuke the file
+	# if the hash is different, remove the line in .delete
+	cd ..
+done
+
+# TODO handle deleting databases if needed
+
+# Clean our our temp db
+#rm -rf /tmp/db-$$
+# vim: filetype=sh

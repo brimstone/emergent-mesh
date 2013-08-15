@@ -326,6 +326,7 @@ fi
 
 HOST="$(uci get system.@system[0].hostname)"
 writestatus
+
 # if we have a link
 if senselink; then
 	logit "has a link"
