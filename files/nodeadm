@@ -252,7 +252,7 @@ dog
 writestatus() {
 	DBROOT="/db"
 	[ ! -d "$DBROOT" ] && mkdir "$DBROOT"
-	[ ! -e "$DBROOT/status/$HOST.json"] && rm -rf "$DBROOT/status" 2>/dev/null
+	[ ! -e "$DBROOT/status/$HOST.json" ] && rm -rf "$DBROOT/status" 2>/dev/null
 	[ ! -d "$DBROOT/status" ] && mkdir "$DBROOT/status"
 
 	. /usr/share/libubox/jshn.sh
@@ -262,6 +262,9 @@ writestatus() {
 	json_add_object flash
 		json_add_int used "$(df /overlay | awk '/^\// { print $4}')"
 		json_add_int total "$(df /overlay | awk '/^\// { print $2}')"
+	json_close_object
+	json_add_object load
+		json_add_string text "$(awk '{print $2}' /proc/loadavg)"
 	json_close_object
 	json_add_object memory
 		json_add_int used "$(free -m | awk '/^Mem/ {print $3}')"
@@ -326,6 +329,11 @@ fi
 
 HOST="$(uci get system.@system[0].hostname)"
 writestatus
+
+avahi-browse -ltrap | awk -F\; '/=;br-lan.*_mesh._tcp/ {print $8}' | while read anode; do
+	echo "Replicating $anode"
+	replicatedb $anode
+done
 
 # if we have a link
 if senselink; then

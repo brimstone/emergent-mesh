@@ -3,30 +3,48 @@
 
 # lock with traps?
 
+
+exec 200>/db/replication-in-progress || exit 1
+if ! flock -n 200; then
+	echo "Can't lock, operation in progress?"
+	exit 1
+fi
+echo "$$" >&200
+
 mkdir /tmp/db-$$
 cd /tmp/db-$$
 wget http://$1/db/all.tar.gz/ -O - | tar -zxf -
 for d in *; do
-	mkdir "/db/$d"
+	mkdir "/db/$d" 2>/dev/null
 done
 find . -type f | while read "afile"; do
-	echo "checking $afile"
-	[ ! -s "/db/$afile" -o "$afile" -nt "/db/$afile" ] && echo "$afile is newer than /db/$afile" && cp "$afile" /db/$afile
+	[ ! -s "/db/$afile" -o "$afile" -nt "/db/$afile" ] && cp "$afile" /db/$afile
 done
 
 # check for deleted files
 cd /db
 # check our files in each .delete
 for d in *; do
+	[ -s $d/.delete ] || continue
 	cd "$d"
 	# check the hash of every file in .delete
-	# if the hash is the same, nuke the file
-	# if the hash is different, remove the line in .delete
+	while read -r ahash afile; do
+		# if the hash is the same, nuke the file
+		if [ -e "$afile" ] && grep -q "$(md5sum $afile)" .delete; then
+			echo "Removing $afile"
+			rm "$afile"
+		# if the hash is different, remove the line in .delete
+		else
+			echo "Removing $afile from .delete"
+			sed -i"" "/^$ahash  $afile\$/d" .delete
+		fi
+	done < .delete
 	cd ..
 done
 
 # TODO handle deleting databases if needed
 
 # Clean our our temp db
-#rm -rf /tmp/db-$$
+rm -rf /tmp/db-$$
+rm /db/replication-in-progress
 # vim: filetype=sh

@@ -31,6 +31,7 @@ define Package/emergent-mesh/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/senselink $(1)/usr/sbin/
 	$(INSTALL_BIN) ./files/nodeadm $(1)/usr/sbin
+	$(INSTALL_BIN) ./files/replicatedb $(1)/usr/sbin
 	$(INSTALL_BIN) ./files/aps $(1)/usr/sbin
 	$(INSTALL_BIN) ./files/captive-portal $(1)/usr/sbin
 	# http stuff
