@@ -1,32 +1,25 @@
 <div class="container" ng-controller="Admin_Ctrl">
-<h1>Mesh</h1>
-<input type="button" class="btn btn-{{(status.mode == 'Gateway') && 'success' || 'primary'}} meshmode" id="gateway" value="Gateway" />
-<input type="button" class="btn btn-{{(status.mode == 'Standalone') && 'success' || 'primary'}} meshmode" id="standalone" value="Standalone" />
-<input type="button" class="btn btn-{{(status.mode == 'Client') && 'success' || 'primary'}} meshmode" id="client" value="Client" />
 
 <div ng-repeat="node in nodekeys">
 	<div class="row">
-		<div class="col-sm-3">
+		<div class="col-xs-3">
 			<h2>{{node.replace(".json", "")}}</h2>
-			{{nodes[node].mode}}
+				<input type="button" class="btn btn-small btn-{{(nodes[node].mode == 'Gateway') && 'success' || 'primary'}} meshmode" id="gateway" value="Gateway" />
+				<input type="button" class="btn btn-small btn-{{(nodes[node].mode == 'Standalone') && 'success' || 'primary'}} meshmode" id="standalone" value="Standalone" />
+				<input type="button" class="btn btn-small btn-{{(nodes[node].mode == 'Client') && 'success' || 'primary'}} meshmode" id="client" value="Client" />
 			<!-- TODO Move buttons down here-->
 		</div>
-		<div class="col-sm-3">
-			<h2>Load</h2>
-			<!-- TODO add this to nodeadm -->
-			<span class="load"><gauge percent="pickles" /></span>
+		<div class="col-xs-3 node-stat">
+			<h2 class="node-stat-title">Load</h2>
+			<span class="load"><gauge percent="nodes[node].load.percent" text="{{nodes[node].load.text}}" /></span>
 		</div>
-		<div class="col-sm-3">
-			<h2>Memory</h2>
-			<!-- TODO Find a good gauge -->
-			{{nodes[node].memory.used}}
-			{{nodes[node].memory.total}}
+		<div class="col-xs-3 node-stat">
+			<h2 class="node-stat-title">Memory</h2>
+			<gauge class="memory" percent="nodes[node].memory.used / nodes[node].memory.total" text="{{nodes[node].memory.text}}" />
 		</div>
-		<div class="col-sm-3">
-			<h2>Flash</h2>
-			<!-- TODO Find a good gauge -->
-			{{nodes[node].flash.used}}
-			{{nodes[node].flash.total}}
+		<div class="col-xs-3 node-stat">
+			<h2 class="node-stat-title">Flash</h2>
+			<gauge class="flash" percent="nodes[node].flash.used / nodes[node].flash.total" text="{{nodes[node].flash.text}}" />
 		</div>
 	</div>
 	<div class="row">
