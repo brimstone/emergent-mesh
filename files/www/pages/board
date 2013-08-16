@@ -1,1 +1,3 @@
+[ -d "/db/board" ] || mkdir /db/board
+[ -d "/db/post" ] || mkdir /db/post
 # vim: filetype=sh
