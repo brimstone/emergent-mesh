@@ -29,17 +29,20 @@ var makeCircle = (function() {
 
 	return {
 		restrict: "E",
-		scope: {"percent": "="},
+		scope: {"percent": "=", "text": "@"},
 		//replace: false,
-		//transclude: false,
+		//transclude: true,
 		template: '<svg viewbox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
 			'	<circle id="back" cx="50" cy="50" r="50" />' +
-			'	<text id="barText" y="62" x="21">{{percent}}%</text>' +
+			'	<text id="barText">{{text}}</text>' +
 			'	<path id="bar" d="" />' +
 			'</svg>',
 		link: function(scope, element, attrs) {
 			scope.$watch("percent", function(value){
-				element.
+				element.find("path").attr("d", makeCircle(Math.round(scope.percent * 100) / 100));
+				var text = element.find("text");
+				text.attr("x", (100 - text[0].getBBox().width) / 2);
+				text.attr("y", 50 - 2 + text[0].getBBox().height / 2);
 			});
 		}
 	};
