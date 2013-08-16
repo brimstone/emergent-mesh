@@ -28,7 +28,6 @@ module.exports = function(grunt) {
 			gruntfile: ['Gruntfile.js'],
 			libs_n_tests: [
 				'js/app.js',
-				'js/partial/*.js',
 				'js/service/*.js',
 				'js/controller/*.js',
 				'js/directives/*.js'
@@ -56,8 +55,8 @@ module.exports = function(grunt) {
 				files: {
 					'files/www/js/all.js': [
 						'js/vendor/*.js',
-						'js/partial/*.js',
 						'js/app.js',
+						'templates.js',
 						'js/service/*.js',
 						'js/controller/*.js',
 						'js/directives/*.js'
@@ -90,6 +89,17 @@ module.exports = function(grunt) {
 				command: "ssh root@172.16.0.2 rm /www/js/all.js.gz; scp files/www/js/all.js root@172.16.0.2:/www/js/"
 			}
 		},
+		html2js: {
+			options: {
+				base: "js",
+				module: "templates",
+				indentString: "	"
+			},
+			main: {
+				src: ['js/partial/*.html'],
+				dest: 'templates.js'
+			}
+		},
 		watch: {
 			gruntfile: {
 				files: ['<%= jshint.gruntfile %>'],
@@ -112,6 +122,11 @@ module.exports = function(grunt) {
 			},
 			www: {
 				files: ['files/www/**'],
+				// yes, no tasks here
+			},
+			html2js: {
+				files: ['js/partial/*.html'],
+				tasks: ['html2js', 'concat', 'shell:js']
 			}
 		},
 	});
@@ -125,9 +140,10 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-shell');
 	grunt.loadNpmTasks('grunt-recess');
+	grunt.loadNpmTasks('grunt-html2js');
 
 	grunt.registerTask('css', ['recess', 'shell:gzipcss']);
-	grunt.registerTask('js', ['jshint', 'concat', 'uglify', 'shell:gzipjs']);
+	grunt.registerTask('js', ['jshint', 'html2js', 'concat', 'uglify', 'shell:gzipjs']);
 	// Default task.
 	grunt.registerTask('default', ['css', 'js']);
 
