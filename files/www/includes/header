@@ -6,26 +6,6 @@ cat << dog
 <meta charset="utf-8">
 <title>Emergent Mesh</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style type="text/css">
-	body {
-		padding-top: 60px;
-		padding-bottom: 40px;
-	}
-	.hero-unit h1 {
-		font-size: 40px !important;
-	}
-	.hero-unit {
-		padding: 40px !important;
-		margin-top: -20px !important;
-	}
-	@media (max-width: 767px) {
-		.hero-unit {
-			margin-left: -20px;
-			margin-right: -20px;
-		}
-	}
-</style>
 <link type="text/css" rel="stylesheet" href="/css/all.css" />
 <script src="/js/all.js"></script>
 <script src="http://localhost:35729/livereload.js"></script>

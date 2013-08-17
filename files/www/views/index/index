@@ -2,7 +2,7 @@
 <div class="container">
 	<div class="jumbotron">
 		<h1>Don't Panic</h1>
-		<p>You're on a wireless mesh setup to provide communication with other people in the area.</p>
+		<p>You've connected to a wireless mesh setup to provide communication with other people in the area.</p>
 		<p>$(link "Learn more &raquo;" "about" "" 'class="btn btn-primary btn-large"')
 		$([ -n "$token" ] && echo "<a href=\"http://$MYIP:2050/nodogsplash_auth/?redir=http%3A%2F%2Fgoogle.com&tok=$token\" class=\"btn btn-primary btn-success btn-large\">Let me online &raquo;</a>")</p>
 	</div>
@@ -11,18 +11,18 @@
 	<div class="row">
 		<div class="col-lg-4">
 			<h2>Message Board</h2>
-			<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-			<p>$(link "View details &raquo;" "board" "" 'class="btn btn-default"')</p>
-		</div>
-		<div class="col-lg-4">
-			<h2>Live Webchat</h2>
-			<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-			<p>$(link "View details &raquo;" "chat" "" 'class="btn btn-default"')</p>
+			<p>Here is a place to post information about what's around you and read about what is around other people. </p>
+			<p>$(link "View details &raquo;" "board" "" 'class="btn btn-primary"')</p>
 		</div>
 		<div class="col-lg-4">
 			<h2>Local Resources</h2>
 			<p>Looking for water or electricity near by?</p>
-			<p>$(link "View details &raquo;" "wiki" "" 'class="btn btn-default"')</p>
+			<p>$(link "View details &raquo;" "wiki" "" 'class="btn btn-primary"')</p>
+		</div>
+		<div class="col-lg-4">
+			<h2>Live Webchat</h2>
+			<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+			<p>$(link "View details &raquo;" "chat" "" 'class="btn btn-primary"')</p>
 		</div>
 	</div>
 </div>
