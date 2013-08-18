@@ -23,12 +23,10 @@ cat << dog
 		<a href="#" class="navbar-brand">Emergent Mesh</a>
 		<div collapse="navCollapsed" class="nav-collapse collapse navbar-responsive-collapse">
 			<ul class="nav navbar-nav">
-				<li$([ "$page" = "about" ] && echo ' class="active"')>$(link About about)</li>
-				<!--li$([ "$page" = "contact" ] && echo ' class="active"')>$(link Contact contact)</li-->
-				<li$([ "$page" = "board" ] && echo ' class="active"')>$(link "Message Board" board)</li>
-				<!--li$([ "$page" = "chat" ] && echo ' class="active"')>$(link Chat chat)</li-->
-				<li$([ "$page" = "wiki" ] && echo ' class="active"')>$(link Resources wiki)</li>
-				<li$([ "$page" = "admin" ] && echo ' class="active"')>$(link Admin admin)</li>
+				<li$([ "$page" = "about" ] && echo ' class="active"')><a href="/#/about">About</a></li>
+				<li$([ "$page" = "board" ] && echo ' class="active"')><a href="/#/board">Message Board</a></li>
+				<li$([ "$page" = "wiki" ] && echo ' class="active"')><a href="/#/wiki">Resources</a></li>
+				<li$([ "$page" = "admin" ] && echo ' class="active"')><a href="/admin">Admin</a></li>
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Services <b class="caret"></b></a>
 					<ul class="dropdown-menu">

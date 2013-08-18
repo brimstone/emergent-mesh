@@ -1,10 +1,10 @@
-angular.module('templates', ['partial/board.html', 'partial/list.html', 'partial/post.html']);
+angular.module('templates', ['partial/board.html', 'partial/index.html', 'partial/list.html', 'partial/post.html']);
 
 angular.module("partial/board.html", []).run(["$templateCache", function($templateCache) {
 	$templateCache.put("partial/board.html",
 		"<ul class=\"breadcrumb\">\n" +
-		"  <li><a href=\"/board/#/board\">Boards</a></li>\n" +
-		"  <li class=\"active\" ng-bind=\"boards[board_id].name\">Board</li>\n" +
+		"	<li><a href=\"/board/#/board\">Boards</a></li>\n" +
+		"	<li class=\"active\" ng-bind=\"boards[board_id].name\">Board</li>\n" +
 		"</ul>\n" +
 		"<div class=\"container\">\n" +
 		"<table class=\"table table-striped\">\n" +
@@ -25,10 +25,41 @@ angular.module("partial/board.html", []).run(["$templateCache", function($templa
 		"");
 }]);
 
+angular.module("partial/index.html", []).run(["$templateCache", function($templateCache) {
+	$templateCache.put("partial/index.html",
+		"<div class=\"jumbotron\">\n" +
+		"	<h1>Don't Panic</h1>\n" +
+		"	<p>You've connected to a wireless mesh setup to provide communication with other people in the area.</p>\n" +
+		"	<p><a href=\"#/about\" class=\"btn btn-primary btn-large\">Learn more &raquo;</a> \n" +
+		"	<a href=\"\" class=\"btn btn-primary btn-success btn-large\">Let me online &raquo;</a></p>\n" +
+		"</div>\n" +
+		"\n" +
+		"<!-- Example row of columns -->\n" +
+		"<div class=\"row\">\n" +
+		"	<div class=\"col-lg-4\">\n" +
+		"		<h2>Message Board</h2>\n" +
+		"		<p>Here is a place to post information about what's around you and read about what is around other people. </p>\n" +
+		"		<p><a href=\"#/board\" class=\"btn btn-primary\">Board &raquo;</a></p>\n" +
+		"	</div>\n" +
+		"	<div class=\"col-lg-4\">\n" +
+		"		<h2>Local Resources</h2>\n" +
+		"		<p>Looking for water or electricity near by?</p>\n" +
+		"		<p><a href=\"#/wiki\" class=\"btn btn-primary\">Resources &raquo;</a></p>\n" +
+		"	</div>\n" +
+		"	<div class=\"col-lg-4\">\n" +
+		"		<h2>Live Webchat</h2>\n" +
+		"		<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>\n" +
+		"		<p><a href=\"#/chat\" class=\"btn btn-primary\">Chat &raquo;</a></p>\n" +
+		"	</div>\n" +
+		"</div>\n" +
+		"");
+}]);
+
 angular.module("partial/list.html", []).run(["$templateCache", function($templateCache) {
 	$templateCache.put("partial/list.html",
 		"<ul class=\"breadcrumb\">\n" +
-		"  <li class=\"active\">Boards</li>\n" +
+		"	<li class=\"active\">Boards</li>\n" +
+		"	<a href=\"\" class=\"pull-right\"><i class=\"icon-file\"></i> New</a>\n" +
 		"</ul>\n" +
 		"<table class=\"table table-striped\">\n" +
 		"<tr>\n" +
