@@ -5,6 +5,7 @@ angular.module("partial/board.html", []).run(["$templateCache", function($templa
 		"<ul class=\"breadcrumb\">\n" +
 		"	<li><a href=\"/board/#/board\">Boards</a></li>\n" +
 		"	<li class=\"active\" ng-bind=\"boards[board_id].name\">Board</li>\n" +
+		"	<a href=\"\" class=\"pull-right btn btn-xs btn-default\"><i class=\"icon-file\"></i> New Post</a>\n" +
 		"</ul>\n" +
 		"<div class=\"container\">\n" +
 		"<table class=\"table table-striped\">\n" +
@@ -59,7 +60,6 @@ angular.module("partial/list.html", []).run(["$templateCache", function($templat
 	$templateCache.put("partial/list.html",
 		"<ul class=\"breadcrumb\">\n" +
 		"	<li class=\"active\">Boards</li>\n" +
-		"	<a href=\"\" class=\"pull-right\"><i class=\"icon-file\"></i> New</a>\n" +
 		"</ul>\n" +
 		"<table class=\"table table-striped\">\n" +
 		"<tr>\n" +
