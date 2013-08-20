@@ -1,3 +1,0 @@
-<div class="container" ng-controller="PageCtrl">
-Stuff and things, this is a very static page
-</div>
