@@ -27,10 +27,8 @@ module.exports = function(grunt) {
 		jshint: {
 			gruntfile: ['Gruntfile.js'],
 			libs_n_tests: [
-				'js/app.js',
-				'js/service/*.js',
-				'js/controller/*.js',
-				'js/directives/*.js'
+				'js/app/**/*.js',
+				
 				],
 			options: {
 				curly: true,
@@ -55,11 +53,9 @@ module.exports = function(grunt) {
 				files: {
 					'files/www/js/all.js': [
 						'js/vendor/*.js',
-						'js/app.js',
+						'js/app/app.js',
+						'js/app/**/*.js',
 						'templates.js',
-						'js/service/*.js',
-						'js/controller/*.js',
-						'js/directives/*.js'
 					]
 				}
 			}
@@ -91,12 +87,12 @@ module.exports = function(grunt) {
 		},
 		html2js: {
 			options: {
-				base: "js",
+				base: "js/app",
 				module: "templates",
 				indentString: "	"
 			},
 			main: {
-				src: ['js/partial/*.html'],
+				src: ['js/app/*/*.html'],
 				dest: 'templates.js'
 			}
 		},
