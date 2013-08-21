@@ -103,8 +103,8 @@ module.exports = function(grunt) {
 			},
 			libs_n_tests: {
 				files: ['<%= jshint.libs_n_tests %>'],
-				//tasks: ['jshint:libs_n_tests', 'concat', 'uglify', 'shell:gzipjs'],
-				tasks: ['jshint:libs_n_tests', 'concat', 'shell:gzipjs'],
+				tasks: ['jshint:libs_n_tests', 'concat', 'uglify', 'shell:gzipjs'],
+				//tasks: ['jshint:libs_n_tests', 'concat', 'shell:js'],
 				options: {
 					livereload: true
 				}
@@ -122,7 +122,7 @@ module.exports = function(grunt) {
 			},
 			html2js: {
 				files: ['js/app/**/*.html'],
-				tasks: ['html2js', 'concat', 'shell:gzipjs']
+				tasks: ['html2js', 'concat', 'uglify', 'shell:gzipjs']
 			}
 		},
 	});

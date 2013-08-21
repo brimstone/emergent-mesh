@@ -7,7 +7,7 @@ window.app.controller('Post_Ctrl', ['$scope', 'DB_Service', '$routeParams', func
 	$scope.posts = [];
 
 	$scope.allposts = DB_Service.posts;
-	$scope.allposts.$then(function(){
+	$scope.allposts.$promise.then(function(){
 		for (var p in $scope.allposts) {
 			if ($scope.allposts[p].parent_id === $scope.post_id) {
 				var post = $scope.allposts[p];
@@ -16,7 +16,6 @@ window.app.controller('Post_Ctrl', ['$scope', 'DB_Service', '$routeParams', func
 			}
 		}
 		$scope.post = $scope.allposts[$routeParams.post_id];
-		console.log($scope.posts);
 		$scope.board = DB_Service.boards[$scope.post.board_id];
 	});
 }]);
