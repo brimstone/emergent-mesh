@@ -20,7 +20,7 @@ cat << dog
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 		</button>
-		<a href="#" class="navbar-brand">Emergent Mesh</a>
+		<a href="/" class="navbar-brand">Emergent Mesh</a>
 		<div collapse="navCollapsed" class="nav-collapse collapse navbar-responsive-collapse">
 			<ul class="nav navbar-nav">
 				<li$([ "$page" = "about" ] && echo ' class="active"')><a href="/about">About</a></li>
