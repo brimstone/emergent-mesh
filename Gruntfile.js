@@ -121,7 +121,7 @@ module.exports = function(grunt) {
 				// yes, no tasks here
 			},
 			html2js: {
-				files: ['js/partial/*.html'],
+				files: ['js/app/**/*.html'],
 				tasks: ['html2js', 'concat', 'shell:gzipjs']
 			}
 		},
