@@ -9,7 +9,6 @@ window.app = angular.module('WebUI', ['ui.bootstrap', 'ngResource', 'graphing.di
 	.when('/board/post/:post_id', {templateUrl: 'board/post.html', controller: 'Post_Ctrl'})
 	.when('/', {templateUrl: 'index/index.html'})
 	.otherwise({redirectTo: '/'});
-	console.log(window.location.pathname);
 }]);
 
 
