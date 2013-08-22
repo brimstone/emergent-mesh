@@ -31,5 +31,11 @@ window.app.factory("DB_Service", ['$rootScope', '$resource', function($rootScope
 		boardkeys: boardkeys,
 		posts: posts,
 		postkeys: postkeys,
+		get: function(db_name, item) {
+			var items = db.get({db: db_name, id: item}, function() {
+				console.log(Object.keys(items));
+			});
+			return items;
+		}
 	};
 }]);
