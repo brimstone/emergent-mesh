@@ -36,7 +36,7 @@
 
         image: "Image <img> Ctrl+G",
         imagedescription: "enter image description here",
-        imagedialog: "<p><b>Insert Image</b></p><p>http://example.com/images/diagram.jpg \"optional title\"<br><br>Need <a href='http://www.google.com/search?q=free+image+hosting' target='_blank'>free image hosting?</a></p>",
+        imagedialog: "<p><b>Insert Image</b></p><p>http://example.com/images/diagram.jpg \"optional title\"</p>",
 
         olist: "Numbered List <ol> Ctrl+O",
         ulist: "Bulleted List <ul> Ctrl+U",
@@ -1217,7 +1217,8 @@
         var inputBox = panels.input,
             buttons = {}; // buttons.undo, buttons.link, etc. The actual DOM elements.
 
-        makeSpritedButtonRow();
+        //makeSpritedButtonRow();
+		makeButtonRow();
 
         var keyEvent = "keydown";
         if (uaSniffed.isOpera) {
@@ -1315,7 +1316,6 @@
 
         // Perform the button's action.
         function doClick(button) {
-
             inputBox.focus();
 
             if (button.textOp) {
@@ -1379,16 +1379,8 @@
             var normalYShift = "0px";
             var disabledYShift = "-20px";
             var highlightYShift = "-40px";
-            var image = button.getElementsByTagName("span")[0];
             if (isEnabled) {
-                image.style.backgroundPosition = button.XShift + " " + normalYShift;
-                button.onmouseover = function () {
-                    image.style.backgroundPosition = this.XShift + " " + highlightYShift;
-                };
-
-                button.onmouseout = function () {
-                    image.style.backgroundPosition = this.XShift + " " + normalYShift;
-                };
+				button.disabled="disabled";
 
                 // IE tries to select the background image "button" text (it's
                 // implemented in a list item) so we have to cache the selection
@@ -1413,10 +1405,6 @@
                     }
                 }
             }
-            else {
-                image.style.backgroundPosition = button.XShift + " " + disabledYShift;
-                button.onmouseover = button.onmouseout = button.onclick = function () { };
-            }
         }
 
         function bindCommand(method) {
@@ -1433,21 +1421,19 @@
             var disabledYShift = "-20px";
             var highlightYShift = "-40px";
 
-            var buttonRow = document.createElement("ul");
+            var buttonRow = document.createElement("div");
             buttonRow.id = "wmd-button-row" + postfix;
-            buttonRow.className = 'wmd-button-row';
+            buttonRow.className = 'btn-group';
             buttonRow = buttonBar.appendChild(buttonRow);
             var xPosition = 0;
             var makeButton = function (id, title, XShift, textOp) {
-                var button = document.createElement("li");
-                button.className = "wmd-button";
-                button.style.left = xPosition + "px";
-                xPosition += 25;
-                var buttonImage = document.createElement("span");
+                var button = document.createElement("button");
+                button.className = "btn btn-default";
+                var buttonImage = document.createElement("i");
+				buttonImage.className = "icon-" + title;
                 button.id = id + postfix;
                 button.appendChild(buttonImage);
                 button.title = title;
-                button.XShift = XShift;
                 if (textOp)
                     button.textOp = textOp;
                 setupButton(button, true);
@@ -1455,7 +1441,7 @@
                 return button;
             };
             var makeSpacer = function (num) {
-                var spacer = document.createElement("li");
+                var spacer = document.createElement("div");
                 spacer.className = "wmd-spacer wmd-spacer" + num;
                 spacer.id = "wmd-spacer" + num + postfix;
                 buttonRow.appendChild(spacer);
@@ -1512,6 +1498,76 @@
 
             setUndoRedoButtonStates();
         }
+
+		function makeButtonRow() {
+			var buttonBar = panels.buttonBar;
+
+			var makeButtonGroup = function(buttons) {
+				var buttongroup = document.createElement("div");
+				buttongroup.className = "btn-group";
+				for(var i in buttons) {
+					buttongroup.appendChild(buttons[i]);
+				}
+				return buttongroup;
+					
+			}
+			var makeButton = function(name, textOp) {
+				var button = document.createElement("div");
+				button.className="btn btn-default";
+				var buttonImage = document.createElement("i");
+				buttonImage.className = "icon-" + name
+				button.appendChild(buttonImage);
+				button.text = name;
+				if (textOp)
+					button.textOp = textOp;
+				setupButton(button, true);
+				return button;
+			}
+
+			buttons.bold = makeButton("bold", bindCommand("doBold"));
+			buttons.italic = makeButton("italic", bindCommand("doItalic"));
+			buttons.link = makeButton("link", bindCommand(function (chunk, postProcessing) {
+				return this.doLinkOrImage(chunk, postProcessing, false);
+			}));
+			buttons.quote = makeButton("quote-right", bindCommand("doBlockquote"));
+			buttons.code = makeButton("code", bindCommand("doCode"));
+			buttons.image = makeButton("picture", bindCommand(function (chunk, postProcessing) {
+				return this.doLinkOrImage(chunk, postProcessing, true);
+			}));
+
+			buttons.undo = makeButton("undo", null);
+			buttons.undo.execute = function (manager) { if (manager) manager.undo(); };
+
+            var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
+                getString("redo") :
+                getString("redomac"); // mac and other non-Windows platforms
+
+            buttons.redo = makeButton("repeat", null);
+            buttons.redo.execute = function (manager) { if (manager) manager.redo(); };
+
+			buttonBar.className="btn-toolbar";
+
+			buttonBar.appendChild(
+				makeButtonGroup([
+					buttons.bold,
+					buttons.italic
+				])
+			);
+			buttonBar.appendChild(
+				makeButtonGroup([
+					buttons.quote,
+					buttons.code,
+					buttons.image
+				])
+			);
+			buttonBar.appendChild(
+				makeButtonGroup([
+					buttons.undo,
+					buttons.redo
+				])
+			);
+            setUndoRedoButtonStates();
+		}
 
         function setUndoRedoButtonStates() {
             if (undoManager) {
