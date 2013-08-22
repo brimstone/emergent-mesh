@@ -14,13 +14,15 @@ cat << dog
 
 <div class="navbar navbar-inverse navbar-fixed-top" ng-controller="Nav_Ctrl">
 	<div class="container">
-		<!--button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse"-->
-		<button ng-click="navCollapsed = !navCollapsed" class="navbar-toggle">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-		</button>
-		<a href="/" class="navbar-brand">Emergent Mesh</a>
+		<div class="navbar-header">
+			<!--button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse"-->
+			<button ng-click="navCollapsed = !navCollapsed" class="navbar-toggle">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a href="/" class="navbar-brand">Emergent Mesh</a>
+		</div>
 		<div collapse="navCollapsed" class="nav-collapse collapse navbar-responsive-collapse">
 			<ul class="nav navbar-nav">
 				<li$([ "$page" = "about" ] && echo ' class="active"')><a href="/about">About</a></li>
@@ -30,9 +32,9 @@ cat << dog
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Services <b class="caret"></b></a>
 					<ul class="dropdown-menu">
-$(avahi-browse -ltrap | awk '/=;br-lan.*_http._tcp/' | grep -Ev "$(avahi-browse -ltrap | awk -F\; '/=;br-lan.*_mesh/ { printf $8 "|"}')XXX" | while read -r aservice; do
-echo "						<li><a href=\"http://$(echo "$aservice" | awk -F\; '{print $8}')/PATH\">$(echo "$aservice" | awk -F\; '{gsub(/\\032/, " ", $4); print $4}')</a></li>"
-done)
+	$(avahi-browse -ltrap | awk '/=;br-lan.*_http._tcp/' | grep -Ev "$(avahi-browse -ltrap | awk -F\; '/=;br-lan.*_mesh/ { printf $8 "|"}')XXX" | while read -r aservice; do
+	echo "					<li><a href=\"http://$(echo "$aservice" | awk -F\; '{print $8}')/PATH\">$(echo "$aservice" | awk -F\; '{gsub(/\\032/, " ", $4); print $4}')</a></li>"
+	done)
 					</ul>
 				</li>
 			</ul>
