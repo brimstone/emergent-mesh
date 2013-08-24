@@ -1,6 +1,6 @@
 window.app.controller('Post_Ctrl', ['$scope', 'DB_Service', '$routeParams', function ($scope, DB_Service, $routeParams) {
 	"use strict";
-	$scope.boards = DB_Service.boards;
+	/* $scope.boards = DB_Service.boards;
 
 	$scope.post_id = $routeParams.post_id;
 	$scope.post = {};
@@ -18,4 +18,5 @@ window.app.controller('Post_Ctrl', ['$scope', 'DB_Service', '$routeParams', func
 		$scope.post = $scope.allposts[$routeParams.post_id];
 		$scope.board = DB_Service.boards[$scope.post.board_id];
 	});
+	*/
 }]);

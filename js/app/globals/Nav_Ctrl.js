@@ -1,4 +1,6 @@
-window.app.controller('Nav_Ctrl', ['$scope', 'DB_Service', '$routeParams', function ($scope, DB_Service, $routeParams) {
+window.app.controller('Nav_Ctrl', ['$scope', '$rootScope', function ($scope, $rootScope) {
 	"use strict";
-	$scope.navCollapsed = false;
+	$rootScope.$on("$routeChangeStart", function (event, next, current) {
+		$scope.navCollapsed = false;
+	});
 }]);

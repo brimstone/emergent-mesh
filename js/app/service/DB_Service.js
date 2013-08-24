@@ -1,41 +1,41 @@
-window.app.factory("DB_Service", ['$rootScope', '$resource', function($rootScope, $resource) {
+window.app.factory("DB_Service", ['$rootScope', '$resource', '$timeout', function($rootScope, $resource, $timeout) {
 	"use strict";
-	var db = $resource('/db/:db/:id', {}, {
+	var server = $resource('/db/:db/:id', {}, {
 		get: {method: 'GET'},
 		get_all: {method: 'GET', params: {id: ''}}
 	});
 
-	var boardkeys = [];
-	var boards = db.get_all({db: "boards"}, function (){
-		for (var key in boards) {
-			if (key.substr(0,1) !== '$') {
-				boardkeys.push(key.replace(".json", ""));
-				boards[key.replace(".json", "")] = boards[key];
-				delete boards[key];
+	var DBs = {};
+
+	var update_db = function(db, database) {
+		database.$promise.then(function() {
+			DBs[db]._keys = [];
+			// TODO need to flush out the keys
+			for (var key in database) {
+				if (key.substr(0,1) !== '$' && key.substr(0,1) !== '_') {
+					DBs[db]._keys.push(key.replace(".json", ""));
+					DBs[db][key.replace(".json", "")] = database[key];
+				}
 			}
+		});
+	};
+
+	var update = function() {
+		console.log("I'm running");
+		for(var db in DBs) {
+			update_db(db, server.get_all({db: db}));
 		}
-	});
-	var postkeys = [];
-	var posts = db.get_all({db: "posts"}, function (){
-		for (var key in posts) {
-			if (key.substr(0,1) !== '$') {
-				postkeys.push(key.replace(".json", ""));
-				posts[key.replace(".json", "")] = posts[key];
-				delete posts[key];
-			}
-		}
-	});
+		$timeout(update, 10000);
+	};
+	// Figure out why this isn't called immedately at startup
+	update();
 
 	return {
-		boards: boards,
-		boardkeys: boardkeys,
-		posts: posts,
-		postkeys: postkeys,
-		get: function(db_name, item) {
-			var items = db.get({db: db_name, id: item}, function() {
-				console.log(Object.keys(items));
-			});
-			return items;
+		get: function(db_name) {
+			if (!DBs[db_name]) {
+				DBs[db_name] = {};
+			}
+			return DBs[db_name];
 		}
 	};
 }]);

@@ -2,10 +2,9 @@
 	<li><a href="/board">Boards</a></li>
 	<li class="active" ng-bind="boards[board_id].name">Board</li>
 	<div class="btn-group btn-group-xs pull-right">
-		<a href="" class="btn btn-default"><i class="icon-file"></i> New Post</a>
+		<a href="/board/new/{{board_id}}" class="btn btn-default"><i class="icon-file"></i> New Post</a>
 	</div>
 </ul>
-<div class="container">
 <table class="table table-striped">
 <tr>
 	<th>Post</th>
@@ -20,4 +19,3 @@
 	<td><a href="/board/post/1">Lost Kitty</a><br />by Joe User - 22 min ago</td>
 </tr>
 </table>
-</div>

@@ -1,7 +1,8 @@
-window.app.controller('Board_Ctrl', ['$scope', 'DB_Service', '$routeParams', function ($scope, DB_Service, $routeParams) {
+window.app.controller('Board_Ctrl', ['$scope', 'DB_Service', '$routeParams', function ($scope, DB, $routeParams) {
 	"use strict";
-	$scope.boards = DB_Service.boards;
+	$scope.boards = DB.get('boards');
 	$scope.board_id = $routeParams.board_id;
+	/*
 	$scope.allposts = DB_Service.posts;
 	$scope.allposts.$promise.then(function(){
 		for (var p in $scope.allposts) {
@@ -15,4 +16,5 @@ window.app.controller('Board_Ctrl', ['$scope', 'DB_Service', '$routeParams', fun
 		}
 	});
 	$scope.posts = [];
+	*/
 }]);
