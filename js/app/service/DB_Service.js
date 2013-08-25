@@ -5,7 +5,7 @@ window.app.factory("DB_Service", ['$rootScope', '$resource', '$timeout', functio
 		get_all: {method: 'GET', params: {id: ''}}
 	});
 
-	var DBs = {};
+	var DBs = {cbs: {}};
 
 	var update_db = function(db, database) {
 		database.$promise.then(function() {
@@ -17,23 +17,37 @@ window.app.factory("DB_Service", ['$rootScope', '$resource', '$timeout', functio
 					DBs[db][key.replace(".json", "")] = database[key];
 				}
 			}
+			for (var cb in DBs.cbs[db]) {
+				DBs.cbs[db][cb]();
+			}
 		});
 	};
 
 	var update = function() {
-		console.log("I'm running");
+		console.log(DBs);
 		for(var db in DBs) {
+			if(db === "cbs") {
+				continue;
+			}
 			update_db(db, server.get_all({db: db}));
 		}
 		$timeout(update, 10000);
 	};
 	// Figure out why this isn't called immedately at startup
-	update();
+	$timeout(update, 10000);
 
 	return {
 		get: function(db_name) {
 			if (!DBs[db_name]) {
+				// set up a new db structure
 				DBs[db_name] = {};
+				// setup an array for callbacks
+				DBs.cbs[db_name] = [];
+				DBs[db_name].then = function(cb) {
+					// adding a callback
+					DBs.cbs[db_name].push(cb);
+					return DBs[db_name];
+				};
 			}
 			return DBs[db_name];
 		}
