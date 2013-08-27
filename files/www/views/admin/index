@@ -1,25 +1,25 @@
 <div class="container" ng-controller="Admin_Ctrl">
 
-<div ng-repeat="node in nodekeys">
+<div ng-repeat="node in nodes">
 	<div class="row">
 		<div class="col-xs-3">
-			<h2>{{node.replace(".json", "")}}</h2>
-				<input type="button" class="btn btn-small btn-{{(nodes[node].mode == 'Gateway') && 'success' || 'primary'}} meshmode" id="gateway" value="Gateway" />
-				<input type="button" class="btn btn-small btn-{{(nodes[node].mode == 'Standalone') && 'success' || 'primary'}} meshmode" id="standalone" value="Standalone" />
-				<input type="button" class="btn btn-small btn-{{(nodes[node].mode == 'Client') && 'success' || 'primary'}} meshmode" id="client" value="Client" />
+			<h2 ng-bind="node.name">Node</h2>
+				<input type="button" class="btn btn-small btn-{{(node.mode == 'Gateway') && 'success' || 'primary'}} meshmode" id="gateway" value="Gateway" />
+				<input type="button" class="btn btn-small btn-{{(node.mode == 'Standalone') && 'success' || 'primary'}} meshmode" id="standalone" value="Standalone" />
+				<input type="button" class="btn btn-small btn-{{(node.mode == 'Client') && 'success' || 'primary'}} meshmode" id="client" value="Client" />
 			<!-- TODO Move buttons down here-->
 		</div>
 		<div class="col-xs-3 node-stat">
 			<h2 class="node-stat-title">Load</h2>
-			<span class="load"><gauge percent="nodes[node].load.percent" text="{{nodes[node].load.text}}" /></span>
+			<span class="load"><gauge percent="node.load.percent" text="{{node.load.text}}" /></span>
 		</div>
 		<div class="col-xs-3 node-stat">
 			<h2 class="node-stat-title">Memory</h2>
-			<gauge class="memory" percent="nodes[node].memory.used / nodes[node].memory.total" text="{{nodes[node].memory.text}}" />
+			<gauge class="memory" percent="node.memory.used / node.memory.total" text="{{node.memory.text}}" />
 		</div>
 		<div class="col-xs-3 node-stat">
 			<h2 class="node-stat-title">Flash</h2>
-			<gauge class="flash" percent="nodes[node].flash.used / nodes[node].flash.total" text="{{nodes[node].flash.text}}" />
+			<gauge class="flash" percent="node.flash.used / node.flash.total" text="{{node.flash.text}}" />
 		</div>
 	</div>
 	<div class="row">
@@ -32,7 +32,7 @@
 				<th>Signal</th>
 				<th>Bitrate</th>
 			</tr>
-				<tr ng-repeat="client in nodes[node].clients">
+				<tr ng-repeat="client in node.clients">
 					<td>{{client.mac}}</td>
 					<td>{{client.ip}}</td>
 					<td>{{client.time}}</td>
