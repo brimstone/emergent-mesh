@@ -2,6 +2,10 @@
   <li><a href="/board">Boards</a></li>
   <li><a href="/board/{{post.board_id}}" ng-bind="boards[post.board_id].name">Board</a></li>
   <li class="active" ng-bind="post.title">Post</li>
+	<div class="btn-group btn-group-xs pull-right">
+		<a href="/board/new/post/{{board_id}}" class="btn btn-default"><i class="icon-file"></i> New Post</a>
+		<a href="/board/new/reply/{{post.id}}" class="btn btn-default"><i class="icon-rotate-left"></i> Reply</a>
+	</div>
 </ul>
 
 <div class="container">
