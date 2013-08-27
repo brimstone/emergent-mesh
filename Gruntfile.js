@@ -139,7 +139,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-html2js');
 
 	grunt.registerTask('css', ['recess', 'shell:gzipcss']);
-	grunt.registerTask('js', ['jshint', 'html2js', 'concat', 'uglify', 'shell:gzipjs']);
+	grunt.registerTask('js', ['jshint', 'html2js', 'concat', 'shell:js']);
 	// Default task.
 	grunt.registerTask('default', ['css', 'js']);
 
