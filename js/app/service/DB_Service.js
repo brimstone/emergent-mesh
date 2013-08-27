@@ -24,17 +24,20 @@ window.app.factory("DB_Service", ['$rootScope', '$resource', '$timeout', functio
 	};
 
 	var update = function() {
-		console.log(DBs);
 		for(var db in DBs) {
 			if(db === "cbs") {
 				continue;
 			}
 			update_db(db, server.get_all({db: db}));
 		}
-		$timeout(update, 10000);
 	};
-	// Figure out why this isn't called immedately at startup
-	$timeout(update, 10000);
+
+	var update_later = function() {
+		update();
+		$timeout(update_later, 30000);
+	};
+
+	$timeout(update_later, 30000);
 
 	return {
 		get: function(db_name) {
@@ -43,12 +46,14 @@ window.app.factory("DB_Service", ['$rootScope', '$resource', '$timeout', functio
 				DBs[db_name] = {};
 				// setup an array for callbacks
 				DBs.cbs[db_name] = [];
-				DBs[db_name].then = function(cb) {
+				// This function cannot be named then. I don't know why.
+				DBs[db_name].next = function(cb) {
 					// adding a callback
 					DBs.cbs[db_name].push(cb);
 					return DBs[db_name];
 				};
 			}
+			update();
 			return DBs[db_name];
 		}
 	};
