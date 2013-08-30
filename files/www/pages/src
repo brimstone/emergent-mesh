@@ -1,0 +1,12 @@
+case "$method" in
+"snapshot.tar.gz")
+	echo "Content-type: application/gzip" >&2
+	echo "Content-Disposition: attachment; filename=\"snapshot.tar\"" >&2
+	echo "" >&2
+	tar -c /www 2>/dev/null
+	return
+	break
+	;;
+esac
+
+# vim: filetype=sh
