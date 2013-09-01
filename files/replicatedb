@@ -29,8 +29,10 @@ for d in *; do
 	cd "$d"
 	# check the hash of every file in .delete
 	while read -r ahash afile; do
+		# if the file doesn't exist, skip it
+		[ ! -e "$afile" ] && continue
 		# if the hash is the same, nuke the file
-		if [ -e "$afile" ] && grep -q "$(md5sum $afile)" .delete; then
+		if grep -q "$(md5sum $afile)" .delete; then
 			echo "Removing $afile"
 			rm "$afile"
 		# if the hash is different, remove the line in .delete
