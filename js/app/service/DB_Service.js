@@ -54,6 +54,18 @@ window.app.factory("DB_Service", ['$rootScope', '$resource', '$timeout', functio
 			}
 			update();
 			return DBs[db_name];
+		},
+		new: function(db_name, item){
+			var s = new Server();
+			var guid='xxxxxxxx'.replace(/[xy]/g, function(c) {
+				var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+				return v.toString(16);
+			});
+			for(var k in item) {
+				s[k] = item[k];
+			}
+			s.$save({db: db_name, id: guid});
+			return guid;
 		}
 	};
 }]);
