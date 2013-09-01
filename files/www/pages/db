@@ -75,6 +75,10 @@ case "$REQUEST_METHOD" in
 	break
 	;;
 "POST")
+	# if we don't have a DB name
+	if [ -z "$db" ]; then
+		error 400 "Must have db name" && return
+	fi
 	[ ! -d "$db" ] && mkdir "$db"
 	echo "$POSTRAW" > "$db/$doc"
 	good

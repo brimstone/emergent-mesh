@@ -9,11 +9,14 @@ window.app.controller('Wiki_Ctrl', ['$scope', 'DB_Service', '$routeParams', func
 		page_id = "index";
 	}
 
+	var editor;
+
 	$scope.page = DB.get('wiki', page_id);
 
 	$scope.page.next(function() {
-		var converter1 = new Markdown.Converter();
-		var editor1 = new Markdown.Editor(converter1);
-		editor1.run();
+		if (!editor) {
+			editor = new Markdown.Editor(new Markdown.Converter());
+			editor.run();
+		}
 	});
 }]);

@@ -8,13 +8,12 @@
 	</div>
 </ul>
 
-<div class="container">
 <div class="panel panel-default">
-<div class="panel-heading"><b ng-bind="post.title"></b> by {{post.author}} - 30 min ago</div>
-<p class="panel-body" ng-bind="post.text"></p>
+	<div class="panel-heading"><b ng-bind="post.title"></b> by {{post.author}} - 30 min ago</div>
+	<p class="panel-body" ng-bind="post.text"></p>
 </div>
+
 <div class="panel panel-default" ng-repeat="post in posts">
-<div class="panel-heading"><b ng-bind="post.title"></b> by {{post.author}} - 30 min ago</div>
-<p class="panel-body" ng-bind="post.text"></p>
-</div>
+	<div class="panel-heading"><b ng-bind="post.title"></b> by {{post.author}} - 30 min ago</div>
+	<p class="panel-body" ng-bind="post.text"></p>
 </div>

@@ -1,8 +1,7 @@
 window.app.factory("DB_Service", ['$rootScope', '$resource', '$timeout', function($rootScope, $resource, $timeout) {
 	"use strict";
-	var server = $resource('/db/:db/:id', {}, {
+	var Server = $resource('/db/:db/:id', {}, {
 		get: {method: 'GET'},
-		get_all: {method: 'GET', params: {id: ''}}
 	});
 
 	var DBs = {cbs: {}};
@@ -28,7 +27,7 @@ window.app.factory("DB_Service", ['$rootScope', '$resource', '$timeout', functio
 			if(db === "cbs") {
 				continue;
 			}
-			update_db(db, server.get_all({db: db}));
+			update_db(db, Server.get({db: db}));
 		}
 	};
 
