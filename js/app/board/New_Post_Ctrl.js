@@ -13,19 +13,22 @@ window.app.controller('New_Post_Ctrl', ['$scope', 'DB_Service', '$routeParams', 
 		}
 		if ($routeParams.type === "reply") {
 			$scope.boards = DB.get('boards').next(function() {
+				$scope.post.board_id = $scope.posts[$routeParams.id].board_id;
+				$scope.post.parent_id = $routeParams.id;
 				$scope.board = $scope.boards[$scope.posts[$routeParams.id].board_id];
 			});
 		}
 	});
 	if ($routeParams.type === "post") {
 		$scope.boards = DB.get('boards').next(function() {
+			$scope.post.board_id = $routeParams.id;
+			$scope.post.parent_id = null;
 			$scope.board = $scope.boards[$routeParams.id];
 		});
 	}
 	//setTimeout(function(){ console.log("New Post found the following:", $scope.boards); }, 2000);
 	$scope.save = function () {
 		console.log("Saving data", $scope.posts);
-		$scope.posts["test"] = $scope.post;
-		$scope.posts["test"].$save();
+		DB.new('posts', $scope.post);
 	};
 }]);
